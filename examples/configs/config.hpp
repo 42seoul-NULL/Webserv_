@@ -26,6 +26,7 @@ class config
 		config& operator=(const config& origin){};
 
 		static config*	instance;
+		std::map<std::string, location> locations;
 
 		std::string		ip;
 		int				port;
