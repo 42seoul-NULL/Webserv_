@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/04 18:23:57 by honlee            #+#    #+#             */
-/*   Updated: 2021/05/05 14:55:00 by honlee           ###   ########.fr       */
+/*   Updated: 2021/05/06 18:48:43 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,8 +57,7 @@ int main(int ac, char **av)
 		fgets(message, BUF_SIZE, stdin);
 		
 		if (!strcmp(message, "q\n") || !strcmp(message, "Q\n"))
-			break ;
-		
+			break ;		
 		write(sock, message, strlen(message));
 		str_len = read(sock, message, BUF_SIZE - 1);
 		message[str_len] = 0;

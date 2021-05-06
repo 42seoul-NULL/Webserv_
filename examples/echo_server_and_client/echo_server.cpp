@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/04 11:01:07 by honlee            #+#    #+#             */
-/*   Updated: 2021/05/05 19:51:05 by honlee           ###   ########.fr       */
+/*   Updated: 2021/05/06 17:40:19 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,10 +109,14 @@ int     main(int ac, char **av)
 		//클라이언트와 연결된 소켓을통해 데이터 송수신한다.
 		//
 		while ((str_len = read(client_socket, message, BUF_SIZE)) != 0)
+		{
+			write(1, message, str_len);
 			write(client_socket, message, str_len);
+		}
 
+		printf("read : %d\n", str_len);
 		//111번 라인에서 무한루프를 돌기 때문에 다른 클라이언트의 요청을 처리 할수 없는 상태가 된다.
-		printf("hello\n");
+		//printf("hello\n");
 		close(client_socket);
 	}
 	close(server_socket);
