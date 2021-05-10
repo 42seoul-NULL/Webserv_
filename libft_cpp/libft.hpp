@@ -34,7 +34,7 @@ void				ft_bzero(void *s, size_t n);
 // char				*ft_strrchr(const char *s, int c);
 // char				*ft_strnstr(const char *str, const char *to_find, size_t len);
 // int					ft_strncmp(char *s1, char *s2, size_t n);
-int					ft_atoi(const char *str);
+int					ft_atoi(const std::string& str);
 int					ft_isalpha(int c);
 int					ft_isdigit(int c);
 int					ft_isalnum(int c);

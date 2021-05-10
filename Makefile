@@ -6,12 +6,13 @@
 #    By: honlee <honlee@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/04/08 21:20:00 by honlee            #+#    #+#              #
-#    Updated: 2021/05/10 15:33:07 by honlee           ###   ########.fr        #
+#    Updated: 2021/05/10 21:26:00 by honlee           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 SRCNAME	=		\
 					main.cpp\
+					parser.cpp\
 
 SRCDIR		=		./srcs/
 
@@ -33,14 +34,17 @@ ${NAME}     :
 					cp libft_cpp/${LIB_NAME} ${LIB_NAME}
 					${CC} ${CF} ${LIB_NAME} -o ${NAME} 
 
-test		:
+dbg		:
 					${CC} ${DCF} ${LIB_NAME} -o ${NAME}
-					./webserv
+					lldb webserv -- configs/test.conf
+
+test		:
+					${CC} ${CF} ${LIB_NAME} -o ${NAME}
+					./webserv configs/test.conf
 
 fclean		:
 					make fclean -C "./libft_cpp"
-					rm -rf a.out
-					rm -rf a.out.dSYM
+					rm -rf webserv.dSYM
 					rm -rf ${NAME}
 					rm -rf ${LIB_NAME}
 
