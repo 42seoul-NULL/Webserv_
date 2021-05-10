@@ -1,4 +1,4 @@
-#include "libft.h"
+#include "libft.hpp"
 
 void	ft_bzero(void *s, size_t n)
 {

@@ -1,6 +1,6 @@
-#include "libft.h"
+#include "libft.hpp"
 
-int		ft_atoi(const char *str)
+int		ft_atoi(const std::string& str)
 {
 	int	i;
 	int	sign;
