@@ -10,14 +10,15 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef LIBFT_H
-# define LIBFT_H
+#ifndef LIBFT_HPP
+# define LIBFT_HPP
 
 # include <stdlib.h>
 # include <fcntl.h>
 # include <unistd.h>
 # include <stddef.h>
 # include <string>
+# include <vector>
 
 void				*ft_memset(void *s, int c, size_t n);
 void				ft_bzero(void *s, size_t n);
@@ -48,7 +49,7 @@ int					ft_tolower(int c);
 // char				*ft_substr(const char *s, unsigned int start, size_t len);
 // char				*ft_strjoin(char const *s1, char const *s2);
 char				*ft_strtrim(char const *s1, char const *set);
-char				**ft_split(const char *s, char c);
+bool				ft_split(const std::string &target, const std::string& sep, std::vector<std::string> &saver);
 std::string			ft_itoa(int n);
 std::string			ft_strmapi(const char *s, char (*f)(unsigned int, char));
 void				ft_putchar_fd(char c, int fd);
