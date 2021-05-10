@@ -6,12 +6,18 @@
 #    By: honlee <honlee@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/04/08 21:20:00 by honlee            #+#    #+#              #
-#    Updated: 2021/05/10 09:48:42 by honlee           ###   ########.fr        #
+#    Updated: 2021/05/10 10:09:05 by honlee           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS		=		\
+SRCNAME	=		\
 					main.cpp\
+
+SRCDIR		=		./srcs/
+
+SRCS		=		${addprefix ${SRCDIR}, ${SRCNAME}}
+
+INCDIR		=		./includes/
 
 NAME		=		webserv
 
@@ -19,7 +25,7 @@ LIB_NAME	=		libft.a
 
 CC			=		clang++
 
-CF			=		-Wall -Wextra -Werror -std=c++98 ${SRCS}
+CF			=		-Wall -Wextra -Werror -std=c++98 -I ${INCDIR} ${SRCS}
 DCF			=		-g ${SRCS}
 
 ${NAME}     :
@@ -27,10 +33,11 @@ ${NAME}     :
 					cp libft_cpp/${LIB_NAME} ${LIB_NAME}
 					${CC} ${CF} ${LIB_NAME} -o ${NAME} 
 
-test		:		fclean
-					${CC} ${DCF} -o ${NAME}
+test		:		
+					${CC} ${DCF} ${LIB_NAME} -o ${NAME}
+					./webserv
 
-fclean		:		
+fclean		:
 					make fclean -C "./libft_cpp"
 					rm -rf ${NAME}
 					rm -rf ${LIB_NAME}
