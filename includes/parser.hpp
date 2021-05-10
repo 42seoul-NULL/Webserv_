@@ -23,12 +23,13 @@
 # include <vector>
 
 class Location;
+class Server;
 
 class Config
 {
 	private :
 		Config(){};
-		Config(const Config& src){};
+		Config(const Config &src);
 		Config& operator=(const Config& src);
 
 		std::map<std::string, Server> servers;
@@ -51,19 +52,19 @@ class Server
 
 	public	:
 		Server(){};
-		Server(const Server& src){};
-		Server& operator=(const Server& src);
+		Server(const Server &src);
+		Server& operator=(const Server &src);
 		virtual	~Server();
 
 		void	setPort(int port);
-		void	setIP(const std::string& ip);
-		void	setServerName(const std::string& server_name);
+		void	setIP(const std::string &ip);
+		void	setServerName(const std::string &server_name);
 
-		const std::string& getIP();
-		const std::string& getServerName();
+		const std::string &getIP();
+		const std::string &getServerName();
 		int				   getPort();
 
-		std::map<std::string, Location>& getLocations();
+		std::map<std::string, Location> &getLocations();
 };
 
 class Location
@@ -74,21 +75,24 @@ class Location
 		std::list<std::string> allow_methods;
 		unsigned int	client_body_buffer_size;
 		std::string		error_page;
+		std::string		error_number;
 
 	public	:
 		Location(){};
 		virtual ~Location(){};
-		Location(const Location& src){};
-		Location& operator=(const Location& src);
+		Location(const Location &src);
+		Location& operator=(const Location &src);
 
-		void			setRoot(const std::string& root);
+		void			setRoot(const std::string &root);
 		void			setClientBodyBufferSize(unsigned int client_body_buffer_size);
-		void			setErrorPage(const std::string& error_page);
+		void			setErrorPage(const std::string &error_page);
+		void			setErrorNumber(const std::string &error_number);
 
-		const std::string& getRoot();
-		std::list<std::string>& getIndex();
-		std::list<std::string>& getAllowMethods();
+		const std::string &getRoot();
+		std::list<std::string> &getIndex();
+		std::list<std::string> &getAllowMethods();
 		unsigned int getClientBodyBufferSize();
-		const std::string& getErrorPage();
+		const std::string &getErrorPage();
+		const std::string &getErorrNumber();
 };
 #endif

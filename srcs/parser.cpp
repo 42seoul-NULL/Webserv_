@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/10 13:52:22 by honlee            #+#    #+#             */
-/*   Updated: 2021/05/10 14:15:37 by honlee           ###   ########.fr       */
+/*   Updated: 2021/05/10 15:31:39 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,11 @@
 
 /////////////////////////////////////////////////////////
 /////////////////// class Config start //////////////////
+Config::Config(const Config &src)
+{
+	(void)src;
+}
+
 Config &Config::operator=(const Config &src)
 {
 	return (*this);
@@ -34,6 +39,11 @@ std::map<std::string, Server> &Config::getServers()
 
 /////////////////////////////////////////////////////////
 ////////////////// class Server start ///////////////////
+Server::Server(const Server& src)
+{
+	(void)src;
+}
+
 Server &Server::operator=(const Server &src)
 {
 	return (*this);
@@ -86,6 +96,11 @@ std::map<std::string, Location> &Server::getLocations()
 
 /////////////////////////////////////////////////////////
 ///////////////// class Location start //////////////////
+Location::Location(const Location &src)
+{
+	(void)src;
+}
+
 Location &Location::operator=(const Location &src)
 {
 	return (*this);
@@ -103,9 +118,15 @@ void		Location::setClientBodyBufferSize(unsigned int client_body_buffer_size)
 	return ;
 }
 
-void		Location::setErrorPage(const std::string& error_page)
+void		Location::setErrorPage(const std::string &error_page)
 {
 	this->error_page = error_page;
+	return ;
+}
+
+void		Location::setErrorNumber(const std::string &error_number)
+{
+	this->error_number = error_number;
 	return ;
 }
 
@@ -132,6 +153,11 @@ unsigned int Location::getClientBodyBufferSize()
 const std::string &Location::getErrorPage()
 {
 	return (this->error_page);
+}
+
+const std::string &Location::getErorrNumber()
+{
+	return (this->error_number);
 }
 ///////////////// class Location end ////////////////////
 /////////////////////////////////////////////////////////

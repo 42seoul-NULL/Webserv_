@@ -1,61 +1,33 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hyeonski <marvin@42.fr>                    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/10/14 09:56:27 by hyeonski          #+#    #+#             */
-/*   Updated: 2020/10/16 23:43:21 by hyeonski         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include <string>
+#include <unistd.h>
 
-#include "get_next_line.h"
+# define OPEN_MAX 10240
+# define BUFFER_SIZE 4096
 
-int	read_file(int fd, char **strd, char *buf, char **nl)
+int get_next_line(int fd, std::string &line)
 {
-	int		read_size;
-	char	*temp;
-
-	read_size = 1;
-	while (((*nl) = ft_strchr(strd[fd], '\n')) == 0 && read_size != 0)
+	static std::string stored[OPEN_MAX];
+	char buf[BUFFER_SIZE + 1];
+	int read_size = 1;
+	
+	std::string temp;
+	while ((stored[fd].find('\n') == std::string::npos) && read_size != 0)
 	{
 		if ((read_size = read(fd, buf, BUFFER_SIZE)) == -1)
-		{
-			free(buf);
 			return (-1);
-		}
 		buf[read_size] = '\0';
-		temp = strd[fd] == NULL ? ft_strdup(buf) : ft_strjoin(strd[fd], buf);
-		if (strd[fd])
-			free(strd[fd]);
-		strd[fd] = temp;
+		temp = buf;
+		stored[fd] += temp;
 	}
-	return (0);
-}
 
-int	get_next_line(int fd, char **line)
-{
-	static char	*stored[OPEN_MAX];
-	int			read_size;
-	char		*nl;
-	char		*buf[BUFFER_SIZE];
-	char		*temp;
-
-	read_size = 1;
-	nl = 0;
-	if (fd < 0 || !line || fd > OPEN_MAX)
-		return (-1);
-	if (read_file(fd, stored, buf, &nl) == -1)
-		return (-1);
-	if (nl != NULL && (temp = stored[fd]))
+	std::string::size_type nl_index;
+	if ((nl_index = stored[fd].find('\n')) != std::string::npos)
 	{
-		*line = ft_substr(stored[fd], 0, nl - stored[fd]);
-		stored[fd] = ft_strdup(nl + 1);
-		free(temp);
+		line = stored[fd].substr(0, nl_index);
+		stored[fd] = stored[fd].substr(nl_index + 1);
 		return (1);
 	}
-	*line = stored[fd];
-	stored[fd] = NULL;
+	line = stored[fd];
+	stored[fd].clear();
 	return (0);
 }
