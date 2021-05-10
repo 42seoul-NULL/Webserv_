@@ -22,38 +22,40 @@
 # include <iostream>
 # include <vector>
 
-class location;
+class Location;
 
-class config
+class Config
 {
 	private :
-		config(){};
-		config(const config& origin){};
-		config& operator=(const config& origin);
+		Config(){};
+		Config(const Config& src){};
+		Config& operator=(const Config& src);
 
-		static config*	instance;
+		std::map<std::string, Server> servers;
+		static Config*	instance;
 
 	public	:
-		virtual ~config();
-		static config* getInstance();
+		virtual ~Config();
+		static Config* getInstance();
+		std::map<std::string, Server>& getServers();
 };
 
-class server
+class Server
 {
 	private	:
 		std::string		ip;
 		int				port;
 		std::string		server_name;
 		std::string		error_page;
-		std::map<std::string, location> locations;
+		std::map<std::string, Location> locations;
 
 	public	:
-		server(){};
-		server(const server& origin){};
-		server& operator=(const server& origin);
-		virtual	~server();
+		Server(){};
+		Server(const Server& src){};
+		Server& operator=(const Server& src);
+		virtual	~Server();
 
-		void	setPort(int value);
+		void	setPort(int port);
 		void	setIP(const std::string& ip);
 		void	setServerName(const std::string& server_name);
 
@@ -61,10 +63,10 @@ class server
 		const std::string& getServerName();
 		int				   getPort();
 
-		std::map<std::string, location>& getLocations();
+		std::map<std::string, Location>& getLocations();
 };
 
-class location
+class Location
 {
 	private	:
 		std::string		root;
@@ -74,19 +76,19 @@ class location
 		std::string		error_page;
 
 	public	:
-		location(){};
-		virtual ~location(){};
-		location(const location& origin);
-		location& operator=(const location& origin);
+		Location(){};
+		virtual ~Location(){};
+		Location(const Location& src){};
+		Location& operator=(const Location& src);
 
 		void			setRoot(const std::string& root);
-		void			setClientBodyBufferSize(unsigned int value);
+		void			setClientBodyBufferSize(unsigned int client_body_buffer_size);
 		void			setErrorPage(const std::string& error_page);
 
 		const std::string& getRoot();
 		std::list<std::string>& getIndex();
 		std::list<std::string>& getAllowMethods();
-		const unsigned int getClientBodyBufferSize();
+		unsigned int getClientBodyBufferSize();
 		const std::string& getErrorPage();
 };
 #endif
