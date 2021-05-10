@@ -1,5 +1,4 @@
-#include "libft.h"
-#include <string>
+#include "libft.hpp"
 
 std::string			ft_strmapi(const std::string& s, char (*f)(unsigned int, char))
 {

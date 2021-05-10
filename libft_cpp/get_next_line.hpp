@@ -12,13 +12,12 @@
 
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
-# ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 4095
 
-# endif
+# define OPEN_MAX 10240
+# define BUFFER_SIZE 4096
+
 # include <stdlib.h>
 # include <unistd.h>
-# include <limits.h>
 
 int		ft_strlen(const char *s);
 char	*ft_strchr(char *str, int c);

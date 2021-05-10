@@ -39,26 +39,23 @@ int	get_next_line(int fd, char **line)
 	static char	*stored[OPEN_MAX];
 	int			read_size;
 	char		*nl;
-	char		*buf;
+	char		*buf[BUFFER_SIZE];
 	char		*temp;
 
 	read_size = 1;
 	nl = 0;
-	if (fd < 0 || BUFFER_SIZE <= 0 || !line || fd > OPEN_MAX)
+	if (fd < 0 || !line || fd > OPEN_MAX)
 		return (-1);
-	if (!(buf = (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1))) ||
-					read_file(fd, stored, buf, &nl) == -1)
+	if (read_file(fd, stored, buf, &nl) == -1)
 		return (-1);
 	if (nl != NULL && (temp = stored[fd]))
 	{
 		*line = ft_substr(stored[fd], 0, nl - stored[fd]);
 		stored[fd] = ft_strdup(nl + 1);
 		free(temp);
-		free(buf);
 		return (1);
 	}
 	*line = stored[fd];
 	stored[fd] = NULL;
-	free(buf);
 	return (0);
 }
