@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyeonski <hyeonski@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/06 20:43:53 by hyeonseun         #+#    #+#             */
-/*   Updated: 2021/05/07 20:40:06 by hyeonski         ###   ########.fr       */
+/*   Updated: 2021/05/10 09:35:52 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ void				*ft_calloc(size_t count, size_t size);
 char				*ft_strdup(const char *src);
 
 
-char				*ft_substr(char const *s, unsigned int start, size_t len);
+char				*ft_substr(const char *s, unsigned int start, size_t len);
 char				*ft_strjoin(char const *s1, char const *s2);
 char				*ft_strtrim(char const *s1, char const *set);
 char				**ft_split(const char *s, char c);

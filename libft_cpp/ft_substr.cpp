@@ -1,6 +1,6 @@
 #include "libft.h"
 
-const char	*ft_substr(const char *s, unsigned int start, size_t len)
+char	*ft_substr(const char *s, unsigned int start, size_t len)
 {
 	size_t	i;
 	size_t	size;
