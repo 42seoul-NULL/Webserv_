@@ -6,13 +6,14 @@
 #    By: honlee <honlee@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/04/08 21:20:00 by honlee            #+#    #+#              #
-#    Updated: 2021/05/10 21:26:00 by honlee           ###   ########.fr        #
+#    Updated: 2021/05/11 14:37:44 by honlee           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 SRCNAME	=		\
 					main.cpp\
 					parser.cpp\
+					nginx.cpp\
 
 SRCDIR		=		./srcs/
 

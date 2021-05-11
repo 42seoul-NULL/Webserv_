@@ -24,6 +24,18 @@
 # include "../libft_cpp/libft.hpp"
 # include <queue>
 
+typedef enum			t_status
+{
+	NOT_CONNECTED,
+	HEADER_RECEVING,
+	HEADER_RECEVED,
+	HRADER_PARSING,
+	HEADER_PARSED,
+	BODY_RECEVING,
+	REPSONE_READY
+}						t_status;
+
+
 class Location;
 class Server;
 
@@ -49,6 +61,31 @@ class Config
 		void	show();
 };
 
+class Client
+{
+	private	:
+		std::string		raw_request;
+		std::string		raw_response;
+		Server			*server;
+		t_status		status;
+		int				socket_fd;
+
+	public	:
+		Client();
+		Client(Server *server, int socket_fd);
+		~Client();
+
+		void		setServer(Server *server);
+		void		setSocketFd(int socket_fd);
+		void		setStatus(t_status status);
+
+		std::string	&getRawRequest();
+		std::string	&getRawResponse();
+		Server		*getServer();
+		int			getSocketFd();
+		t_status	getStatus();
+};
+
 class Server
 {
 	private	:
@@ -56,6 +93,7 @@ class Server
 		unsigned short	port;
 		std::string		server_name;
 		std::string		error_page;
+		int				socket_fd;
 		std::map<std::string, Location> locations;
 
 	public	:
@@ -67,12 +105,14 @@ class Server
 		void	setPort(unsigned short port);
 		void	setIP(const std::string &ip);
 		void	setServerName(const std::string &server_name);
+		void	setSocketFd(int socket_fd);
 
 		const std::string &getIP();
 		const std::string &getServerName();
 		unsigned short	   getPort();
+		int				   getSocketFd();
 
-		std::map<std::string, Location> &getLocations();
+		std::map<std::string, Location> &getLocations();	
 		//for test//
 		void	show();
 };

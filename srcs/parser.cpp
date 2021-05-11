@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/10 13:52:22 by honlee            #+#    #+#             */
-/*   Updated: 2021/05/11 12:51:38 by honlee           ###   ########.fr       */
+/*   Updated: 2021/05/11 22:18:41 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 /////////////////////////////////////////////////////////
 /////////////////// class Config start //////////////////
-
 Config* Config::instance;
 
 Config::Config(const Config &src)
@@ -192,9 +191,76 @@ void		Config::show()
 		iter->second.show();
 	}
 }
-
 /////////////////// class Config end ////////////////////
 /////////////////////////////////////////////////////////
+
+
+
+/////////////////////////////////////////////////////////
+////////////////// class Client start ///////////////////
+Client::Client()
+{
+	this->server = NULL;
+	this->socket_fd = -1;
+	this->status = NOT_CONNECTED;
+}
+
+Client::Client(Server *server, int socket_fd) : server(server), socket_fd(socket_fd)
+{
+
+}
+
+Client::~Client()
+{
+
+}
+
+void	Client::setStatus(t_status status)
+{
+	this->status = status;
+	return ;
+}
+
+void	Client::setServer(Server *server)
+{
+	this->server = server;
+	return ;
+}
+
+void	Client::setSocketFd(int socket_fd)
+{
+	this->socket_fd = socket_fd;
+	return ;
+}
+
+t_status	Client::getStatus()
+{
+	return (this->status);
+}
+
+Server	*Client::getServer()
+{
+	return (this->server);
+}
+
+int		Client::getSocketFd()
+{
+	return (this->socket_fd);
+}
+
+std::string &Client::getRawRequest()
+{
+	return (this->raw_request);
+}
+
+std::string &Client::getRawResponse()
+{
+	return (this->raw_response);
+}
+/////////////////// class Client end ////////////////////
+/////////////////////////////////////////////////////////
+
+
 
 /////////////////////////////////////////////////////////
 ////////////////// class Server start ///////////////////
@@ -210,7 +276,13 @@ Server::Server(const Server& src)
 
 Server &Server::operator=(const Server &src)
 {
-	(void)src;
+	this->ip = src.ip;
+	this->port	=	src.port;
+	this->server_name	=	src.server_name;
+	this->error_page	=	src.error_page;
+	this->socket_fd		=	src.socket_fd;
+	this->locations		=	src.locations;
+
 	return (*this);
 }
 
@@ -237,6 +309,12 @@ void	Server::setServerName(const std::string &server_name)
 	return ;
 }
 
+void	Server::setSocketFd(int socket_fd)
+{
+	this->socket_fd = socket_fd;
+	return ;
+}
+
 const std::string &Server::getIP()
 {
 	return (this->ip);
@@ -252,10 +330,16 @@ unsigned short		Server::getPort()
 	return (this->port);
 }
 
+int					Server::getSocketFd()
+{
+	return (this->socket_fd);
+}
+
 std::map<std::string, Location> &Server::getLocations()
 {
 	return (this->locations);
 }
+
 //for test
 void		Server::show()
 {
