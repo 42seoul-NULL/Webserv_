@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   libft.hpp                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/02/06 20:43:53 by hyeonseun         #+#    #+#             */
-/*   Updated: 2021/05/10 09:35:52 by honlee           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef LIBFT_HPP
 # define LIBFT_HPP
 
@@ -51,7 +39,7 @@ int					ft_tolower(int c);
 bool				ft_split(const std::string &target, const std::string& sep, std::vector<std::string> &saver);
 // char				*ft_strtrim(char const *s1, char const *set);
 std::string			ft_itoa(int n);
-std::string			ft_strmapi(const char *s, char (*f)(unsigned int, char));
+std::string			ft_strmapi(const std::string& s, char (*f)(unsigned int, char));
 void				ft_putchar_fd(char c, int fd);
 void				ft_putstr_fd(const std::string &str, int fd);
 void				ft_putendl_fd(const std::string &str, int fd);
