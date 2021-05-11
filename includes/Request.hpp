@@ -14,8 +14,6 @@
 # define REQUEST_HPP
 
 # include <iostream>
-# include <sys/time.h>
-# include <ctime>
 
 class Request
 {
@@ -33,9 +31,9 @@ class Request
 
 	public:
 		Request(void);
-		Request(const Request& src) {};
-		virtual ~Request(void) {};
-		Request& operator=(const Request& src) {};
+		Request(const Request& src);
+		virtual ~Request(void){};
+		Request& operator=(const Request& src);
 
 		const std::string&	getAcceptCharsets(void) const;
 		const std::string&	getAcceptLanguage(void) const;
@@ -59,9 +57,22 @@ class Request
 		void	setTransferEncoding(const std::string& transfer_encoding);
 		void	setUserAgent(const std::string& user_agent);
 
-		
+		void	initRequest(void);
 
-		std::string&	createRequestHeader();
+		void	generateRequest(const std::string& raw);
+
+		void	parseAcceptCharsets(const std::string& raw);
+		void	parseAcceptLanguage(const std::string& raw);
+		void	parseAuthorization(const std::string& raw);
+		void	parseContentLength(const std::string& raw);
+		void	parseContentType(const std::string& raw);
+		void	parseDate(const std::string& raw);
+		void	parseHost(const std::string& raw);
+		void	parseReferer(const std::string& raw);
+		void	parseTransferEncoding(const std::string& raw);
+		void	parseUserAgent(const std::string& raw);
+
+		std::string	createRawRequest(void) const;
 };
 
 #endif

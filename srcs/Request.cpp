@@ -17,9 +17,17 @@ Request::Request(void) : accept_charsets(""), accept_language(""), authorization
 
 }
 
-///////////////////////////////////////////////////////////////
-/////////////       Request Class Getter        ///////////////
-///////////////////////////////////////////////////////////////
+Request::Request(const Request& src)
+{
+	(void)src;
+}
+
+Request&	Request::operator=(const Request& src)
+{
+	(void)src;
+
+	return (*this);
+}
 
 const std::string&	Request::getAcceptCharsets(void) const
 {
@@ -63,17 +71,13 @@ const std::string&	Request::getReferer(void) const
 
 const std::string&	Request::getTransferEncoding(void) const
 {
-	return (this->getTransferEncoding);
+	return (this->transfer_encoding);
 }
 
 const std::string&	Request::getUserAgent(void) const
 {
 	return (this->user_agent);
 }
-
-///////////////////////////////////////////////////////////////
-/////////////       Request Class Setter        ///////////////
-///////////////////////////////////////////////////////////////
 
 void	Request::setAcceptCharsets(const std::string& accept_charsets)
 {
@@ -125,16 +129,167 @@ void	Request::setUserAgent(const std::string& user_agent)
 	this->user_agent = user_agent;
 }
 
-///////////////////////////////////////////////////////////////
-/////////////         Request Variable          ///////////////
-///////////////////////////////////////////////////////////////
+void	Request::initRequest(void)
+{
+	this->accept_charsets = "";
+	this->accept_language = "";
+	this->authorization = "";
+	this->content_length = "";
+	this->content_type = "";
+	this->date = "";
+	this->host = "";
+	this->referer = "";
+	this->transfer_encoding = "";
+	this->user_agent = "";
+}
 
+void	Request::generateRequest(const std::string& raw)
+{
+	std::string	raw_header = raw.substr(raw.find("\r\n"));
 
-///////////////////////////////////////////////////////////////
-/////////////          Request Header           ///////////////
-///////////////////////////////////////////////////////////////
+	parseAcceptCharsets(raw_header);
+	parseAcceptLanguage(raw_header);
+	parseAuthorization(raw_header);
+	parseContentLength(raw_header);
+	parseContentType(raw_header);
+	parseDate(raw_header);
+	parseHost(raw_header);
+	parseReferer(raw_header);
+	parseTransferEncoding(raw_header);
+	parseUserAgent(raw_header);
+}
 
-std::string&	Request::createRequestHeader()
+void	Request::parseAcceptCharsets(const std::string& raw)
+{
+	std::string	key = "Accept-Charsets: ";
+	std::size_t	found = raw.find(key);
+
+	if (found != std::string::npos)
+	{
+		std::size_t	target_pos = found + key.length();
+
+		this->accept_charsets = raw.substr(target_pos, raw.find("\r\n", target_pos) - target_pos + 1);
+	}
+}
+
+void	Request::parseAcceptLanguage(const std::string& raw)
+{
+	std::string key = "Accept-Language: ";
+	std::size_t found = raw.find(key);
+
+	if (found != std::string::npos)
+	{
+		std::size_t target_pos = found + key.length();
+		
+		this->accept_language = raw.substr(target_pos, raw.find("\r\n", target_pos) - target_pos + 1);
+	}
+}
+
+void	Request::parseAuthorization(const std::string& raw)
+{
+	std::string key = "Authorization: ";
+	std::size_t found = raw.find(key);
+
+	if (found != std::string::npos)
+	{
+		std::size_t target_pos = found + key.length();
+		
+		this->authorization = raw.substr(target_pos, raw.find("\r\n", target_pos) - target_pos + 1);
+	}
+}
+
+void	Request::parseContentLength(const std::string& raw)
+{
+	std::string key = "Content-Length: ";
+	std::size_t found = raw.find(key);
+
+	if (found != std::string::npos)
+	{
+		std::size_t target_pos = found + key.length();
+		
+		this->content_length = raw.substr(target_pos, raw.find("\r\n", target_pos) - target_pos + 1);
+	}
+}
+
+void	Request::parseContentType(const std::string& raw)
+{
+	std::string key = "Content-Type: ";
+	std::size_t found = raw.find(key);
+
+	if (found != std::string::npos)
+	{
+		std::size_t target_pos = found + key.length();
+		
+		this->content_type = raw.substr(target_pos, raw.find("\r\n", target_pos) - target_pos + 1);
+	}
+}
+
+void	Request::parseDate(const std::string& raw)
+{
+	std::string key = "Date: ";
+	std::size_t found = raw.find(key);
+
+	if (found != std::string::npos)
+	{
+		std::size_t target_pos = found + key.length();
+		
+		this->date = raw.substr(target_pos, raw.find("\r\n", target_pos) - target_pos + 1);
+	}
+}
+
+void	Request::parseHost(const std::string& raw)
+{
+	std::string key = "Host: ";
+	std::size_t found = raw.find(key);
+
+	if (found != std::string::npos)
+	{
+		std::size_t target_pos = found + key.length();
+		
+		this->host = raw.substr(target_pos, raw.find("\r\n", target_pos) - target_pos + 1);
+	}
+}
+
+void	Request::parseReferer(const std::string& raw)
+{
+	std::string key = "Referer: ";
+	std::size_t found = raw.find(key);
+
+	if (found != std::string::npos)
+	{
+		std::size_t target_pos = found + key.length();
+		
+		this->referer = raw.substr(target_pos, raw.find("\r\n", target_pos) - target_pos + 1);
+	}
+}
+
+void	Request::parseTransferEncoding(const std::string& raw)
+{
+	std::string key = "Transfer-Encoding: ";
+	std::size_t found = raw.find(key);
+
+	if (found != std::string::npos)
+	{
+		std::size_t target_pos = found + key.length();
+		
+		this->transfer_encoding = raw.substr(target_pos, raw.find("\r\n", target_pos) - target_pos + 1);
+	}
+}
+
+void	Request::parseUserAgent(const std::string& raw)
+{
+	std::string key = "User-Agent: ";
+	std::size_t found = raw.find(key);
+
+	if (found != std::string::npos)
+	{
+		std::size_t target_pos = found + key.length();
+		
+		this->user_agent = raw.substr(target_pos, raw.find("\r\n", target_pos) - target_pos + 1);
+	}
+}
+
+std::string	Request::createRawRequest(void) const
 {
 	std::string	header = std::string("");
 
