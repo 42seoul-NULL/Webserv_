@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/10 13:52:22 by honlee            #+#    #+#             */
-/*   Updated: 2021/05/10 22:45:55 by honlee           ###   ########.fr       */
+/*   Updated: 2021/05/11 12:51:38 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,9 @@ bool	Config::isReserved(const std::string &src)
 		src == "index" ||
 		src == "upload_path" ||
 		src == "auto_index" ||
-		src == "client_body_buffer_size")
+		src == "client_body_buffer_size" ||
+		src == "}" ||
+		src == "{" )
 		return (true);
 	return (false);
 }
@@ -77,7 +79,7 @@ bool	Config::makeConfig(const char *path)
 	int				ret;
 	std::string		splited;
 	std::vector<std::string> vec;
-	std::string		server_name;
+	std::string		key;
 	std::string		location_name;
 
 	fd = open(path, O_RDONLY);
@@ -88,93 +90,94 @@ bool	Config::makeConfig(const char *path)
 	{
 		while ( (ret = get_next_line(fd, line)) > 0)
 		{
-			vec.clear();
 			if (line == "")
 				continue ;
 			splited = ft_split(line, " \t", vec);
 			line.clear();
+		}
 
-			for (std::vector<std::string>::iterator iter = vec.begin(); iter != vec.end(); iter++)
+		for (std::vector<std::string>::iterator iter = vec.begin(); iter != vec.end(); iter++)
+		{
+			if (*iter == "server_name")
 			{
-				if (*iter == "server_name")
+				iter++;
+				std::string server_name = *iter;
+				iter++; // listen
+				iter++; // 8080
+				std::string port = *iter;
+				iter++; // 127.0.0.1
+				key = server_name + ":" + port;
+				if (instance->servers.find(key) != instance->servers.end()) // 이미 존재
+					throw "server_name and port already exists";
+				instance->servers[key].setServerName(server_name);
+				instance->servers[key].setPort(ft_atoi(port));
+				instance->servers[key].setIP(*iter);
+			}
+			else if (*iter == "location")
+			{
+				iter++;
+				location_name = *iter;
+			}
+			else if (*iter == "error_page")
+			{
+				iter++;
+				instance->servers[key].getLocations()[location_name].setErrorPage(*iter);
+			}
+			else if (*iter == "error_number")
+			{
+				iter++;
+				instance->servers[key].getLocations()[location_name].setErrorNumber(*iter);
+			}
+			else if (*iter == "allow_methods")
+			{
+				iter++;
+				while (!isReserved(*iter) && iter != vec.end())
 				{
+					instance->servers[key].getLocations()[location_name].getAllowMethods().push_back(*iter);
 					iter++;
-					server_name = *iter;
-					instance->servers[server_name].setServerName(*iter);
 				}
-				else if (*iter == "listen")
+				if (iter == vec.end())
+					break ;
+			}
+			else if (*iter == "root")
+			{
+				iter++;
+				instance->servers[key].getLocations()[location_name].setRoot(*iter);
+			}
+			else if (*iter == "index")
+			{
+				iter++;
+				while (!isReserved(*iter) && iter != vec.end())
 				{
+					instance->servers[key].getLocations()[location_name].getIndex().push_back(*iter);
 					iter++;
-					instance->servers[server_name].setPort(ft_atoi(*iter));
-					iter++;
-					instance->servers[server_name].setIP(*iter);
 				}
-				else if (*iter == "location")
-				{
-					iter++;
-					location_name = *iter;
-				}
-				else if (*iter == "error_page")
-				{
-					iter++;
-					instance->servers[server_name].getLocations()[location_name].setErrorPage(*iter);
-				}
-				else if (*iter == "error_number")
-				{
-					iter++;
-					instance->servers[server_name].getLocations()[location_name].setErrorNumber(*iter);
-				}
-				else if (*iter == "allow_methods")
-				{
-					iter++;
-					while (!isReserved(*iter) && iter != vec.end())
-					{
-						instance->servers[server_name].getLocations()[location_name].getAllowMethods().push_back(*iter);
-						iter++;
-					}
-					if (iter == vec.end())
-						break ;
-				}
-				else if (*iter == "root")
-				{
-					iter++;
-					instance->servers[server_name].getLocations()[location_name].setRoot(*iter);
-				}
-				else if (*iter == "index")
-				{
-					iter++;
-					while (!isReserved(*iter) && iter != vec.end())
-					{
-						instance->servers[server_name].getLocations()[location_name].getIndex().push_back(*iter);
-						iter++;
-					}
-					if (iter == vec.end())
-						break ;
-				}
-				else if (*iter == "upload_path")
-				{
-					iter++;
-					instance->servers[server_name].getLocations()[location_name].setUploadPath(*iter);
-				}
-				else if (*iter == "auto_index")
-				{
-					iter++;
-					if (*iter == "on")
-						instance->servers[server_name].getLocations()[location_name].setAutoIndex(true);
-					else
-						instance->servers[server_name].getLocations()[location_name].setAutoIndex(false);
-				}
-				else if (*iter == "client_body_buffer_size")
-				{
-					iter++;
-					instance->servers[server_name].getLocations()[location_name].setClientBodyBufferSize(ft_atoi(*iter));
-				}
+				if (iter == vec.end())
+					break ;
+			}
+			else if (*iter == "upload_path")
+			{
+				iter++;
+				instance->servers[key].getLocations()[location_name].setUploadPath(*iter);
+			}
+			else if (*iter == "auto_index")
+			{
+				iter++;
+				if (*iter == "on")
+					instance->servers[key].getLocations()[location_name].setAutoIndex(true);
+				else
+					instance->servers[key].getLocations()[location_name].setAutoIndex(false);
+			}
+			else if (*iter == "client_body_buffer_size")
+			{
+				iter++;
+				instance->servers[key].getLocations()[location_name].setClientBodyBufferSize(ft_atoi(*iter));
 			}
 		}
 	}
-	catch(const std::exception& e)
+	catch(const char *e)
 	{
-		std::cout << "Error, while parsing\n";
+		std::cout << e << std::endl;
 		return (false);
 	}
 	return (true);	
@@ -185,7 +188,7 @@ void		Config::show()
 {
 	for (std::map<std::string, Server>::iterator iter = this->servers.begin(); iter != this->servers.end(); iter++)
 	{
-		std::cout << "server name : " << iter->first << std::endl;
+		std::cout << "server key : " << iter->first << std::endl;
 		iter->second.show();
 	}
 }
@@ -216,7 +219,7 @@ Server::~Server()
 	return ;
 }
 
-void	Server::setPort(int port)
+void	Server::setPort(unsigned short port)
 {
 	this->port = port;
 	return ;
@@ -244,7 +247,7 @@ const std::string &Server::getServerName()
 	return (this->server_name);
 }
 
-int		Server::getPort()
+unsigned short		Server::getPort()
 {
 	return (this->port);
 }

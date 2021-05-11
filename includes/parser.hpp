@@ -53,7 +53,7 @@ class Server
 {
 	private	:
 		std::string		ip;
-		int				port;
+		unsigned short	port;
 		std::string		server_name;
 		std::string		error_page;
 		std::map<std::string, Location> locations;
@@ -64,13 +64,13 @@ class Server
 		Server& operator=(const Server &src);
 		virtual	~Server();
 
-		void	setPort(int port);
+		void	setPort(unsigned short port);
 		void	setIP(const std::string &ip);
 		void	setServerName(const std::string &server_name);
 
 		const std::string &getIP();
 		const std::string &getServerName();
-		int				   getPort();
+		unsigned short	   getPort();
 
 		std::map<std::string, Location> &getLocations();
 		//for test//
