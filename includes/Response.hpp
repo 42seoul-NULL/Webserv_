@@ -14,6 +14,7 @@
 # define RESPONSE_HPP
 
 # include <iostream>
+# include <map>
 # include "Request.hpp"
 # include "parser.hpp"
 
@@ -35,6 +36,9 @@ class Response
 		std::string	server;
 		std::string	transfer_encoding;
 		std::string	www_authenticate;
+
+		static std::map<std::string, std::string> mime_type;
+		static std::map<std::string, std::string> status_code;
 
 	public:
 		Response(void);
@@ -79,7 +83,7 @@ class Response
 		void	generateContentType(const Request& request);
 		void	generateDate(const Request& request);
 		void	generateLastModified(const Request& request);
-		void	generateLocation(const Request& request);
+		void	generateLocation(const Request& request, const Server& server);
 		void	generateRetryAfter(const Request& request);
 		void	generateServer(const Request& request);
 		void	generateTransferEncoding(const Request& request);
