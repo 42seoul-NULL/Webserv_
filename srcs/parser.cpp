@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/10 13:52:22 by honlee            #+#    #+#             */
-/*   Updated: 2021/05/11 22:18:41 by honlee           ###   ########.fr       */
+/*   Updated: 2021/05/13 09:05:53 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,12 +200,12 @@ void		Config::show()
 ////////////////// class Client start ///////////////////
 Client::Client()
 {
-	this->server = NULL;
+	this->server_socket = -1;
 	this->socket_fd = -1;
 	this->status = NOT_CONNECTED;
 }
 
-Client::Client(Server *server, int socket_fd) : server(server), socket_fd(socket_fd)
+Client::Client(int server_socket, int socket_fd) : server_socket(server_socket), socket_fd(socket_fd)
 {
 
 }
@@ -221,9 +221,9 @@ void	Client::setStatus(t_status status)
 	return ;
 }
 
-void	Client::setServer(Server *server)
+void	Client::setServerSocket(int server_socket)
 {
-	this->server = server;
+	this->server_socket = server_socket;
 	return ;
 }
 
@@ -238,9 +238,9 @@ t_status	Client::getStatus()
 	return (this->status);
 }
 
-Server	*Client::getServer()
+int			Client::getServerSocket()
 {
-	return (this->server);
+	return (this->server_socket);
 }
 
 int		Client::getSocketFd()

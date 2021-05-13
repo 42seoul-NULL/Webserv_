@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/11 14:37:04 by honlee            #+#    #+#             */
-/*   Updated: 2021/05/11 19:08:37 by honlee           ###   ########.fr       */
+/*   Updated: 2021/05/13 09:06:43 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ class Nginx
 		
 		int		fd_max;
 
-		std::map<int, Server> servers;
+		std::map<int, std::map<std::string, Server> > servers;
 		std::map<int, Client> clients;
 
 	public	:

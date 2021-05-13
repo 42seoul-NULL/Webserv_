@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/11 18:26:40 by honlee            #+#    #+#             */
-/*   Updated: 2021/05/11 22:21:51 by honlee           ###   ########.fr       */
+/*   Updated: 2021/05/13 09:18:43 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,18 @@ Nginx::~Nginx()
 
 bool	Nginx::initServers(int queue_size)
 {
+	std::map<std::string, int> temp_map;
+
 	for (std::map<std::string, Server>::iterator iter = Config::getInstance()->getServers().begin(); iter != Config::getInstance()->getServers().end(); iter++)
 	{
+		std::string key = iter->second.getIP() + ":" + ft_itoa(iter->second.getPort());
+		if (temp_map.find(key) != temp_map.end()) // 이미 존재한다.
+		{
+			this->servers[temp_map[key]][iter->second.getServerName()] = iter->second;
+			std::cout << "Server " << iter->second.getServerName() << "(" << iter->second.getIP() << ":" << iter->second.getPort() << ") launched" << std::endl;	
+			continue ;
+		}
+
 		struct sockaddr_in  server_addr;
 		
 		iter->second.setSocketFd(socket(PF_INET, SOCK_STREAM, 0));
@@ -53,7 +63,8 @@ bool	Nginx::initServers(int queue_size)
 		FT_FD_SET(iter->second.getSocketFd(), &(this->reads));
 		FT_FD_SET(iter->second.getSocketFd(), &(this->errors));
 
-		this->servers[iter->second.getSocketFd()] = iter->second;
+		this->servers[iter->second.getSocketFd()][iter->second.getServerName()] = iter->second;
+		temp_map[key] = iter->second.getSocketFd();
 
 		if (this->fd_max < iter->second.getSocketFd())
 			this->fd_max = iter->second.getSocketFd();
@@ -99,7 +110,7 @@ bool	Nginx::run(struct timeval	timeout, unsigned int buffer_size)
 					if (this->fd_max < client_socket)
 						this->fd_max = client_socket;
 
-					this->clients[client_socket].setServer(&(this->servers[i]));
+					this->clients[client_socket].setServerSocket(i);
 					this->clients[client_socket].setSocketFd(client_socket);
 					
 					std::cout << "connected client : " << client_socket << std::endl;
@@ -114,7 +125,7 @@ bool	Nginx::run(struct timeval	timeout, unsigned int buffer_size)
 						FT_FD_CLR(i, &writes);
 						FT_FD_CLR(i, &errors);
 						close(i);
-						std::cout << "disconnected : " << i << " in Server " << this->clients[i].getServer()->getIP() << ":" << this->clients[i].getServer()->getPort() << std::endl;
+						std::cout << "disconnected : " << i << " in Server ";
 						this->clients.erase(this->clients.find(i));
 					}
 					else // receive request raw data
@@ -141,7 +152,7 @@ bool	Nginx::run(struct timeval	timeout, unsigned int buffer_size)
 					FT_FD_CLR(i, &reads);
 					FT_FD_CLR(i, &errors);
 					close(i);
-					std::cout << "server " << this->servers[i].getServerName() << ":" << this->servers[i].getPort() << " error!!" << std::endl;
+					std::cout << "server " << i << " error!!" << std::endl;
 					this->servers.erase(this->servers.find(i));
 				}
 				else // client socket error

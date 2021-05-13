@@ -35,7 +35,6 @@ typedef enum			t_status
 	REPSONE_READY
 }						t_status;
 
-
 class Location;
 class Server;
 
@@ -66,22 +65,22 @@ class Client
 	private	:
 		std::string		raw_request;
 		std::string		raw_response;
-		Server			*server;
 		t_status		status;
+		int				server_socket;
 		int				socket_fd;
 
 	public	:
 		Client();
-		Client(Server *server, int socket_fd);
+		Client(int server_socket, int socket_fd);
 		~Client();
 
-		void		setServer(Server *server);
+		void		setServerSocket(int server_socket);
 		void		setSocketFd(int socket_fd);
 		void		setStatus(t_status status);
 
 		std::string	&getRawRequest();
 		std::string	&getRawResponse();
-		Server		*getServer();
+		int			getServerSocket();
 		int			getSocketFd();
 		t_status	getStatus();
 };
