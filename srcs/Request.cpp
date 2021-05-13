@@ -12,12 +12,12 @@
 
 #include "../includes/Request.hpp"
 
-Request::Request(void) : raw_request(""), method(""), uri(""), http_version(""), accept_charsets(""), accept_language(""), authorization(""), content_length(""), content_type(""), date(""), host(""), referer(""), transfer_encoding(""), user_agent("")
+Request::Request(void) : raw_request(""), method(""), uri(""), http_version(""), accept_charsets(""), accept_language(""), authorization(""), content_length(""), content_type(""), date(""), host(""), referer(""), transfer_encoding(""), user_agent(""), status(0), type(0)
 {
-	this->raw_request = "GET /tutorials/other/top-20-mysql-best-practices/ HTTP/1.1\r\nHost: net.tutsplus.com\r\nUser-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\nAccept-Language: en-us,en;q=0.5\r\nAccept-Encoding: gzip,deflate\r\nAccept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7\r\n\r\n";
+	this->raw_request = "GET /tutorials/other/top-20-mysql-best-practices/ HTTP/1.1\r\nHost: net.tutsplus.com\r\nUser-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\nAccept-Language: en-us,en;q=0.5\r\nAccept-Encoding: gzip,deflate\r\nAccept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7\r\n\r\n2\r\nab\r\n3\r\nxyz\r\n2\r\nef\r\n0\r\n";
 }
 
-Request::Request(const Request& src) : raw_request(src.raw_request), method(src.method), uri(src.uri), http_version(src.http_version), accept_language(src.accept_language), authorization(src.authorization), content_length(src.content_length), content_type(src.content_type), date(src.date), host(src.host), referer(src.referer), transfer_encoding(src.transfer_encoding), user_agent(src.user_agent)
+Request::Request(const Request& src) : raw_request(src.raw_request), method(src.method), uri(src.uri), http_version(src.http_version), accept_language(src.accept_language), authorization(src.authorization), content_length(src.content_length), content_type(src.content_type), date(src.date), host(src.host), referer(src.referer), transfer_encoding(src.transfer_encoding), user_agent(src.user_agent), status(src.status), type(src.type)
 {
 
 }
@@ -38,6 +38,8 @@ Request&	Request::operator=(const Request& src)
 	this->referer = src.referer;
 	this->transfer_encoding = src.transfer_encoding;
 	this->user_agent = src.user_agent;
+	this->status = 0;
+	this->type = 0;
 
 	return (*this);
 }
@@ -161,11 +163,24 @@ void	Request::initRequest(void)
 	this->user_agent = "";
 }
 
-void	Request::generateRequest(void)
+int	Request::generateRequest(void)
 {
-	this->generateStartLine();
-	this->generateRequestHeader();
-	// this->generateRequestBody();	
+	std::size_t	found = this->raw_request.find("\r\n\r\n");
+	int	res = 1;
+
+	if (found != std::string::npos && status == 0)
+	{
+		this->generateStartLine();
+		this->generateRequestHeader();
+		status = 1;
+		res = bodyCheck();
+	}
+	else if (status == 1)
+	{
+		this->generateRequestBody();
+		return (isComplete());
+	}
+	return (1);
 }
 
 void	Request::generateStartLine(void)
@@ -190,17 +205,15 @@ void	Request::generateRequestHeader(void)
 	this->parseTransferEncoding();
 	this->parseUserAgent();
 
-	this->temp_body += this->raw_request.substr(this->raw_request.find("\r\n\r\n") + 1);
+	//this->transfer_encoding = "chunked";        테스트 할라고 청크만들어서 해쏘요
+
+	this->temp_body += this->raw_request.substr(this->raw_request.find("\r\n\r\n") + 4);
+	this->raw_request.clear();
 }
 
-void	Request::generateRequestBody(const std::string& raw_body)
+void	Request::generateRequestBody(void)
 {
-	// if (this->temp_body != "")
-	// {
-	// 	// this->raw_body += this->temp_body;
-	// 	// this->temp_body.clear();
-	// }
-	// this->raw_body += raw_body;
+	this->temp_body += raw_request;
 }
 
 void	Request::parseMethod(void)
@@ -358,16 +371,43 @@ void	Request::parseUserAgent(void)
 	}
 }
 
-bool	Request::checkChunked(void) const
+bool	Request::bodyCheck(void)
 {
 	if (this->transfer_encoding == "chunked")
-		return (true);
-	return (false);
+		this->type = 2;
+	else if (this->content_length != "")
+		this->type = 1;
+	return (type);
 }
 
-bool	Request::isChunkedComplete(void)
+bool	Request::isComplete(void)
 {
-	
+	if (this->type == 1 && this->temp_body.length() >= (std::size_t)ft_atoi(this->content_length))
+	{
+		this->raw_body += this->temp_body;
+		this->temp_body.clear();
+	}
+	else if (this->type == 2)
+	{
+		std::size_t found = this->temp_body.find("\r\n");
+		std::size_t	chunk_size;
+
+		while  (found != std::string::npos)
+		{
+			chunk_size = ft_atoi(this->temp_body.substr(0, found)); // ft_atoi -> ft_atoi_hex 바꿔야함 10진수로 생각하고 테스트 중
+			if (chunk_size == 0)
+				return (false);
+			this->temp_body = this->temp_body.substr(found + 2);
+			if (this->temp_body.length() >= chunk_size)
+			{
+				found = this->temp_body.find("\r\n");
+				raw_body += this->temp_body.substr(0, found);
+				this->temp_body = this->temp_body.substr(found + 2);
+			}
+			found = this->temp_body.find("\r\n");
+		}
+	}
+	return (true);
 }
 
 std::string	Request::createRawRequest(void) const
@@ -391,3 +431,9 @@ std::string	Request::createRawRequest(void) const
 
 	return (header);
 }
+
+void	Request::bodyPrint(void)
+{
+	std::cout << this->raw_body << std::endl;
+}
+

@@ -13,6 +13,7 @@
 SRCNAME	=		\
 					main.cpp\
 					parser.cpp\
+					Request.cpp
 
 SRCDIR		=		./srcs/
 

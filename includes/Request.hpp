@@ -44,6 +44,8 @@ class Request
 		std::string	raw_body;
 
 		std::string temp_body;
+		int	status;
+		int	type;
 
 	public:
 		Request(void);
@@ -83,10 +85,10 @@ class Request
 
 		void	initRequest(void);
 
-		void	generateRequest(void);
+		int		generateRequest(void);
 		void	generateStartLine(void);
 		void	generateRequestHeader(void);
-		void	generateRequestBody(const std::string& raw_body);
+		void	generateRequestBody(void);
 
 		void	parseMethod(void);
 		void	parseUri(void);
@@ -103,10 +105,11 @@ class Request
 		void	parseTransferEncoding(void);
 		void	parseUserAgent(void);
 
-		bool	checkChunked(void) const;
-		bool	isChunkedComplete(void);
+		bool	bodyCheck(void);
+		bool	isComplete(void);
 
 		std::string	createRawRequest(void) const;
+		void	bodyPrint(void);
 };
 
 #endif
