@@ -42,5 +42,6 @@ uint32_t			ft_ntohl(uint32_t val);
 uint16_t			ft_ntohs(uint16_t val);
 
 unsigned long		ft_get_time(void);
+int					ft_atoi_hex(const std::string &str);
 
 #endif
