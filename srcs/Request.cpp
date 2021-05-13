@@ -12,19 +12,32 @@
 
 #include "../includes/Request.hpp"
 
-Request::Request(void) : accept_charsets(""), accept_language(""), authorization(""), content_length(""), content_type(""), date(""), host(""), referer(""), transfer_encoding(""), user_agent("")
+Request::Request(void) : raw_request(""), method(""), uri(""), http_version(""), accept_charsets(""), accept_language(""), authorization(""), content_length(""), content_type(""), date(""), host(""), referer(""), transfer_encoding(""), user_agent("")
 {
-
+	this->raw_request = "GET /tutorials/other/top-20-mysql-best-practices/ HTTP/1.1\r\nHost: net.tutsplus.com\r\nUser-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\nAccept-Language: en-us,en;q=0.5\r\nAccept-Encoding: gzip,deflate\r\nAccept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7\r\n\r\n";
 }
 
-Request::Request(const Request& src)
+Request::Request(const Request& src) : raw_request(src.raw_request), method(src.method), uri(src.uri), http_version(src.http_version), accept_language(src.accept_language), authorization(src.authorization), content_length(src.content_length), content_type(src.content_type), date(src.date), host(src.host), referer(src.referer), transfer_encoding(src.transfer_encoding), user_agent(src.user_agent)
 {
-	(void)src;
+
 }
 
 Request&	Request::operator=(const Request& src)
 {
-	(void)src;
+	this->raw_request = src.raw_request;
+	this->method = src.method;
+	this->uri = src.uri;
+	this->http_version = src.http_version;
+	this->accept_charsets = src.accept_charsets;
+	this->accept_language = src.accept_language;
+	this->authorization = src.authorization;
+	this->content_length = src.content_length;
+	this->content_type = src.content_type;
+	this->date = src.date;
+	this->host = src.host;
+	this->referer = src.referer;
+	this->transfer_encoding = src.transfer_encoding;
+	this->user_agent = src.user_agent;
 
 	return (*this);
 }
@@ -77,6 +90,11 @@ const std::string&	Request::getTransferEncoding(void) const
 const std::string&	Request::getUserAgent(void) const
 {
 	return (this->user_agent);
+}
+
+void	Request::setRawRequest(const std::string& raw_request)
+{
+	this->raw_request = raw_request;
 }
 
 void	Request::setAcceptCharsets(const std::string& accept_charsets)
@@ -143,157 +161,223 @@ void	Request::initRequest(void)
 	this->user_agent = "";
 }
 
-void	Request::generateRequest(const std::string& raw)
+void	Request::generateRequest(void)
 {
-	std::string	raw_header = raw.substr(raw.find("\r\n"));
-
-	parseAcceptCharsets(raw_header);
-	parseAcceptLanguage(raw_header);
-	parseAuthorization(raw_header);
-	parseContentLength(raw_header);
-	parseContentType(raw_header);
-	parseDate(raw_header);
-	parseHost(raw_header);
-	parseReferer(raw_header);
-	parseTransferEncoding(raw_header);
-	parseUserAgent(raw_header);
+	this->generateStartLine();
+	this->generateRequestHeader();
+	// this->generateRequestBody();	
 }
 
-void	Request::parseAcceptCharsets(const std::string& raw)
+void	Request::generateStartLine(void)
 {
-	std::string	key = "Accept-Charsets: ";
-	std::size_t	found = raw.find(key);
+	this->parseMethod();
+	this->parseUri();
+	this->parseHttpVersion();
+}
+
+void	Request::generateRequestHeader(void)
+{
+	this->raw_header = this->raw_request.substr(this->raw_request.find("\r\n") + 1, this->raw_request.find("\r\n\r\n"));
+
+	this->parseAcceptCharsets();
+	this->parseAcceptLanguage();
+	this->parseAuthorization();
+	this->parseContentLength();
+	this->parseContentType();
+	this->parseDate();
+	this->parseHost();
+	this->parseReferer();
+	this->parseTransferEncoding();
+	this->parseUserAgent();
+
+	this->temp_body += this->raw_request.substr(this->raw_request.find("\r\n\r\n") + 1);
+}
+
+void	Request::generateRequestBody(const std::string& raw_body)
+{
+	// if (this->temp_body != "")
+	// {
+	// 	// this->raw_body += this->temp_body;
+	// 	// this->temp_body.clear();
+	// }
+	// this->raw_body += raw_body;
+}
+
+void	Request::parseMethod(void)
+{
+	std::size_t	found = this->raw_request.find("\r\n");
+	std::string start_line = this->raw_request.substr(0, found);
+
+	this->method = start_line.substr(0, start_line.find(' '));
+}
+
+void	Request::parseUri(void)
+{
+	std::size_t	found = this->raw_request.find("\r\n");
+	std::string start_line = this->raw_request.substr(0, found);
+	std::size_t start_pos = start_line.find(' ');
+
+	this->uri = start_line.substr(start_pos + 1, start_line.find_last_of(' ') - start_pos);
+}
+
+void	Request::parseHttpVersion(void)
+{
+	std::size_t	found = this->raw_request.find("\r\n");
+	std::string start_line = this->raw_request.substr(0, found);
+	
+	this->http_version = start_line.substr(start_line.find_last_of(' ') + 1);
+}
+
+void	Request::parseAcceptCharsets(void)
+{
+	std::string	key = "Accept-Charset: ";
+	std::size_t	found = this->raw_header.find(key);
 
 	if (found != std::string::npos)
 	{
 		std::size_t	target_pos = found + key.length();
 
-		this->accept_charsets = raw.substr(target_pos, raw.find("\r\n", target_pos) - target_pos + 1);
+		this->accept_charsets = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
 	}
 }
 
-void	Request::parseAcceptLanguage(const std::string& raw)
+void	Request::parseAcceptLanguage(void)
 {
 	std::string key = "Accept-Language: ";
-	std::size_t found = raw.find(key);
+	std::size_t found = this->raw_header.find(key);
 
 	if (found != std::string::npos)
 	{
 		std::size_t target_pos = found + key.length();
 		
-		this->accept_language = raw.substr(target_pos, raw.find("\r\n", target_pos) - target_pos + 1);
+		this->accept_language = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
 	}
 }
 
-void	Request::parseAuthorization(const std::string& raw)
+void	Request::parseAuthorization(void)
 {
 	std::string key = "Authorization: ";
-	std::size_t found = raw.find(key);
+	std::size_t found = this->raw_header.find(key);
 
 	if (found != std::string::npos)
 	{
 		std::size_t target_pos = found + key.length();
 		
-		this->authorization = raw.substr(target_pos, raw.find("\r\n", target_pos) - target_pos + 1);
+		this->authorization = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
 	}
 }
 
-void	Request::parseContentLength(const std::string& raw)
+void	Request::parseContentLength(void)
 {
 	std::string key = "Content-Length: ";
-	std::size_t found = raw.find(key);
+	std::size_t found = this->raw_header.find(key);
 
 	if (found != std::string::npos)
 	{
 		std::size_t target_pos = found + key.length();
 		
-		this->content_length = raw.substr(target_pos, raw.find("\r\n", target_pos) - target_pos + 1);
+		this->content_length = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
 	}
 }
 
-void	Request::parseContentType(const std::string& raw)
+void	Request::parseContentType(void)
 {
 	std::string key = "Content-Type: ";
-	std::size_t found = raw.find(key);
+	std::size_t found = this->raw_header.find(key);
 
 	if (found != std::string::npos)
 	{
 		std::size_t target_pos = found + key.length();
 		
-		this->content_type = raw.substr(target_pos, raw.find("\r\n", target_pos) - target_pos + 1);
+		this->content_type = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
 	}
 }
 
-void	Request::parseDate(const std::string& raw)
+void	Request::parseDate(void)
 {
 	std::string key = "Date: ";
-	std::size_t found = raw.find(key);
+	std::size_t found = this->raw_header.find(key);
 
 	if (found != std::string::npos)
 	{
 		std::size_t target_pos = found + key.length();
 		
-		this->date = raw.substr(target_pos, raw.find("\r\n", target_pos) - target_pos + 1);
+		this->date = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
 	}
 }
 
-void	Request::parseHost(const std::string& raw)
+void	Request::parseHost(void)
 {
 	std::string key = "Host: ";
-	std::size_t found = raw.find(key);
+	std::size_t found = this->raw_header.find(key);
 
 	if (found != std::string::npos)
 	{
 		std::size_t target_pos = found + key.length();
 		
-		this->host = raw.substr(target_pos, raw.find("\r\n", target_pos) - target_pos + 1);
+		this->host = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
 	}
 }
 
-void	Request::parseReferer(const std::string& raw)
+void	Request::parseReferer(void)
 {
 	std::string key = "Referer: ";
-	std::size_t found = raw.find(key);
+	std::size_t found = this->raw_header.find(key);
 
 	if (found != std::string::npos)
 	{
 		std::size_t target_pos = found + key.length();
 		
-		this->referer = raw.substr(target_pos, raw.find("\r\n", target_pos) - target_pos + 1);
+		this->referer = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
 	}
 }
 
-void	Request::parseTransferEncoding(const std::string& raw)
+void	Request::parseTransferEncoding(void)
 {
 	std::string key = "Transfer-Encoding: ";
-	std::size_t found = raw.find(key);
+	std::size_t found = this->raw_header.find(key);
 
 	if (found != std::string::npos)
 	{
 		std::size_t target_pos = found + key.length();
 		
-		this->transfer_encoding = raw.substr(target_pos, raw.find("\r\n", target_pos) - target_pos + 1);
+		this->transfer_encoding = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
 	}
 }
 
-void	Request::parseUserAgent(const std::string& raw)
+void	Request::parseUserAgent(void)
 {
 	std::string key = "User-Agent: ";
-	std::size_t found = raw.find(key);
+	std::size_t found = this->raw_header.find(key);
 
 	if (found != std::string::npos)
 	{
 		std::size_t target_pos = found + key.length();
 		
-		this->user_agent = raw.substr(target_pos, raw.find("\r\n", target_pos) - target_pos + 1);
+		this->user_agent = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
 	}
+}
+
+bool	Request::checkChunked(void) const
+{
+	if (this->transfer_encoding == "chunked")
+		return (true);
+	return (false);
+}
+
+bool	Request::isChunkedComplete(void)
+{
+	
 }
 
 std::string	Request::createRawRequest(void) const
 {
 	std::string	header = std::string("");
 
-	header += "Aceept-Charset: " + this->accept_charsets + "\r\n";
+	header += "Method: " + this->method + "\r\n";
+	header += "URI: " + this->uri + "\r\n";
+	header += "HTTP-Version: " + this->http_version + "\r\n";
+	header += "Accept-Charset: " + this->accept_charsets + "\r\n";
 	header += "Accept-Language: " + this->accept_language + "\r\n";
 	header += "Authorization: " + this->authorization + "\r\n";
 	header += "Content-Length: " + this->content_length + "\r\n";

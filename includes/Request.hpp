@@ -14,10 +14,21 @@
 # define REQUEST_HPP
 
 # include <iostream>
+# include <vector>
+# include "../libft_cpp/libft.hpp"
+
+# define NEEDBODY -1
+# define REQUESTCOMPLETE -2
 
 class Request
 {
 	private:
+		std::string	raw_request;
+
+		std::string	method;
+		std::string	uri;
+		std::string	http_version;
+
 		std::string	accept_charsets;
 		std::string	accept_language;
 		std::string	authorization;
@@ -29,12 +40,21 @@ class Request
 		std::string	transfer_encoding;
 		std::string	user_agent;
 
+		std::string raw_header;
+		std::string	raw_body;
+
+		std::string temp_body;
+
 	public:
 		Request(void);
 		Request(const Request& src);
 		virtual ~Request(void){};
 		Request& operator=(const Request& src);
 
+		std::string&	getRawRequest(void);
+		const std::string&	getMethod(void) const;
+		const std::string&	getUri(void) const;
+		const std::string&	getHttpVersion(void) const;
 		const std::string&	getAcceptCharsets(void) const;
 		const std::string&	getAcceptLanguage(void) const;
 		const std::string&	getAuthorization(void) const;
@@ -46,6 +66,10 @@ class Request
 		const std::string&	getTransferEncoding(void) const;
 		const std::string&	getUserAgent(void) const;
 
+		void	setRawRequest(const std::string& raw_request);
+		void	setMethod(const std::string& method);
+		void	setUri(const std::string& uri);
+		void	setHttpVersion(const std::string& http_version);
 		void	setAcceptCharsets(const std::string& accept_charsets);
 		void	setAcceptLanguage(const std::string& accept_language);
 		void	setAuthorization(const std::string& authorization);
@@ -59,18 +83,28 @@ class Request
 
 		void	initRequest(void);
 
-		void	generateRequest(const std::string& raw);
+		void	generateRequest(void);
+		void	generateStartLine(void);
+		void	generateRequestHeader(void);
+		void	generateRequestBody(const std::string& raw_body);
 
-		void	parseAcceptCharsets(const std::string& raw);
-		void	parseAcceptLanguage(const std::string& raw);
-		void	parseAuthorization(const std::string& raw);
-		void	parseContentLength(const std::string& raw);
-		void	parseContentType(const std::string& raw);
-		void	parseDate(const std::string& raw);
-		void	parseHost(const std::string& raw);
-		void	parseReferer(const std::string& raw);
-		void	parseTransferEncoding(const std::string& raw);
-		void	parseUserAgent(const std::string& raw);
+		void	parseMethod(void);
+		void	parseUri(void);
+		void	parseHttpVersion(void);
+
+		void	parseAcceptCharsets(void);
+		void	parseAcceptLanguage(void);
+		void	parseAuthorization(void);
+		void	parseContentLength(void);
+		void	parseContentType(void);
+		void	parseDate(void);
+		void	parseHost(void);
+		void	parseReferer(void);
+		void	parseTransferEncoding(void);
+		void	parseUserAgent(void);
+
+		bool	checkChunked(void) const;
+		bool	isChunkedComplete(void);
 
 		std::string	createRawRequest(void) const;
 };
