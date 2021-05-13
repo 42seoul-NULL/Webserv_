@@ -5,6 +5,7 @@
 # include <fcntl.h>
 # include <unistd.h>
 # include <stddef.h>
+# include <sys/time.h>
 # include <string>
 # include <vector>
 
@@ -39,5 +40,7 @@ uint32_t			ft_htonl(uint32_t val);
 uint16_t			ft_htons(uint16_t val);
 uint32_t			ft_ntohl(uint32_t val);
 uint16_t			ft_ntohs(uint16_t val);
+
+unsigned long		ft_get_time(void);
 
 #endif
