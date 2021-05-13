@@ -23,16 +23,13 @@
 # include <vector>
 # include "../libft_cpp/libft.hpp"
 # include <queue>
+# include "Request.hpp"
 
 typedef enum			t_status
 {
-	NOT_CONNECTED,
-	HEADER_RECEVING,
-	HEADER_RECEVED,
-	HRADER_PARSING,
-	HEADER_PARSED,
-	BODY_RECEVING,
-	REPSONE_READY
+	HEADER_RECEIVING,
+	BODY_RECEIVING,
+	RESPONSE_READY
 }						t_status;
 
 class Location;
@@ -63,26 +60,30 @@ class Config
 class Client
 {
 	private	:
-		std::string		raw_request;
-		std::string		raw_response;
 		t_status		status;
-		int				server_socket;
+		int				server_socket_fd;
 		int				socket_fd;
+		Request			request;
+		long long		remain_body;
+		unsigned long	last_request_ms;
 
 	public	:
 		Client();
-		Client(int server_socket, int socket_fd);
+		Client(int server_socket_fd, int socket_fd);
 		~Client();
 
-		void		setServerSocket(int server_socket);
 		void		setSocketFd(int socket_fd);
+		void		setServerSocketFd(int server_socket_fd);
 		void		setStatus(t_status status);
+		void		setRemainBody(long long remain_body);
+		void		setLastRequestMs(unsigned long last_request_ms);
 
-		std::string	&getRawRequest();
-		std::string	&getRawResponse();
-		int			getServerSocket();
 		int			getSocketFd();
+		int			getServerSocketFd();
+		Request		&getRequest();
 		t_status	getStatus();
+		long long	getRemainBody();
+		unsigned long getLastRequestMs();
 };
 
 class Server
@@ -106,12 +107,13 @@ class Server
 		void	setServerName(const std::string &server_name);
 		void	setSocketFd(int socket_fd);
 
-		const std::string &getIP();
-		const std::string &getServerName();
-		unsigned short	   getPort();
-		int				   getSocketFd();
+		const std::string &getIP() const;
+		const std::string &getServerName() const;
+		unsigned short	   getPort() const;
+		int				   getSocketFd() const;
+		Location			&getPerfectLocation(std::string &uri);
 
-		std::map<std::string, Location> &getLocations();	
+		std::map<std::string, Location> &getLocations();
 		//for test//
 		void	show();
 };
@@ -127,6 +129,8 @@ class Location
 		std::string		error_number;
 		std::string		upload_path;
 		bool			auto_index;
+		std::string		cgi_extension;
+		std::string		auth_key;
 
 	public	:
 		Location();
@@ -140,6 +144,8 @@ class Location
 		void			setErrorNumber(const std::string &error_number);
 		void			setUploadPath(const std::string &upload_path);
 		void			setAutoIndex(bool auto_index);
+		void			setCgiExtension(const std::string &cgi_extension);
+		void			setAuthKey(const std::string &auth_key);
 
 		const std::string &getRoot();
 		std::list<std::string> &getIndex();
@@ -149,6 +155,8 @@ class Location
 		const std::string &getErorrNumber();
 		const std::string &getUploadPath();
 		bool	getAutoIndex();
+		const std::string &getCgiExtension();
+		const std::string &getAuthKey();
 
 		//for test//
 		void	show();

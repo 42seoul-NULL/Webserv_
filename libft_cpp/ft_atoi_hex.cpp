@@ -2,18 +2,24 @@
 
 int ft_atoi_hex(const std::string &str)
 {
-	std::string upper("0123456789ABCDEF");
-	std::string lower("0123456789abcdef");
-
-	size_t idx = 0;
-	int i = 0;
 	int result = 0;
-	while (str[i]
-		&& ((idx = upper.find(str[i]) != std::string::npos)
-		|| (idx = lower.find(str[i]) != std::string::npos)))
+
+	for (std::string::const_iterator iter = str.begin(); iter != str.end(); iter++)
 	{
-		result = result * 16 + idx;
-		i++;
+		if ( *iter >= '0' && *iter <= '9' )
+		{
+			result = result * 16 + (*iter - '0');
+		}
+		else if ( *iter >= 'a' && *iter <= 'f')
+		{
+			result = result * 16 + (*iter - 'a' + 10);
+		}
+		else if ( *iter >= 'A' && *iter <= 'F')
+		{
+			result = result * 16 + (*iter - 'A' + 10);
+		}
+		else
+			break ;
 	}
 	return (result);
 }

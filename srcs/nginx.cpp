@@ -6,13 +6,14 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/11 18:26:40 by honlee            #+#    #+#             */
-/*   Updated: 2021/05/13 09:18:43 by honlee           ###   ########.fr       */
+/*   Updated: 2021/05/14 00:21:58 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/nginx.hpp"
 #include <errno.h>
 #include <string>
+#include <fcntl.h>
 
 Nginx::Nginx() : fd_max(-1)
 {
@@ -23,25 +24,61 @@ Nginx::Nginx() : fd_max(-1)
 
 Nginx::~Nginx()
 {
-	
+
+}
+
+void	Nginx::clear_connected_socket(int connected_socket_fd)
+{
+	FT_FD_CLR(connected_socket_fd, &(this->reads));
+	FT_FD_CLR(connected_socket_fd, &(this->writes));
+	FT_FD_CLR(connected_socket_fd, &(this->errors));
+	close(connected_socket_fd);
+	this->clients.erase(this->clients.find(connected_socket_fd));
+	return ;
+}
+
+const Server &Nginx::getServerFromClient(int server_socket_fd, const std::string &server_name)
+{
+	if (this->servers[server_socket_fd].find(server_name) == this->servers[server_socket_fd].end())
+		return (this->servers[server_socket_fd].begin()->second);
+	return ( (this->servers[server_socket_fd][server_name]) );
+}
+
+Location &Nginx::getPerfectLocation(int server_socket_fd, const std::string &server_name, const std::string &uri)
+{
+	Location &ret = this->servers[server_socket_fd][server_name].getLocations()["/"];
+
+	std::string key = "";
+	for (std::string::const_iterator iter = uri.begin(); iter != uri.end(); iter++)
+	{
+		key += *iter;
+		if (*iter == '/')
+		{
+			if (this->servers[server_socket_fd][server_name].getLocations().find(key) == this->servers[server_socket_fd][server_name].getLocations().end())
+				return (ret);
+			else
+				ret = this->servers[server_socket_fd][server_name].getLocations()[key];
+		}
+	}
+	return (ret);
 }
 
 bool	Nginx::initServers(int queue_size)
 {
-	std::map<std::string, int> temp_map;
+	std::map<std::string, int> temp;
 
 	for (std::map<std::string, Server>::iterator iter = Config::getInstance()->getServers().begin(); iter != Config::getInstance()->getServers().end(); iter++)
 	{
 		std::string key = iter->second.getIP() + ":" + ft_itoa(iter->second.getPort());
-		if (temp_map.find(key) != temp_map.end()) // 이미 존재한다.
+		if (temp.find(key) != temp.end())
 		{
-			this->servers[temp_map[key]][iter->second.getServerName()] = iter->second;
-			std::cout << "Server " << iter->second.getServerName() << "(" << iter->second.getIP() << ":" << iter->second.getPort() << ") launched" << std::endl;	
+			std::cout << "Server " << iter->second.getServerName() << "(" << iter->second.getIP() << ":" << iter->second.getPort() << ") launched" << std::endl;
+			this->servers[temp[key]][iter->second.getServerName()] = iter->second;
 			continue ;
 		}
 
 		struct sockaddr_in  server_addr;
-		
+
 		iter->second.setSocketFd(socket(PF_INET, SOCK_STREAM, 0));
 
 		ft_memset(&server_addr, 0, sizeof(server_addr));
@@ -64,7 +101,7 @@ bool	Nginx::initServers(int queue_size)
 		FT_FD_SET(iter->second.getSocketFd(), &(this->errors));
 
 		this->servers[iter->second.getSocketFd()][iter->second.getServerName()] = iter->second;
-		temp_map[key] = iter->second.getSocketFd();
+		temp[key] = iter->second.getSocketFd();
 
 		if (this->fd_max < iter->second.getSocketFd())
 			this->fd_max = iter->second.getSocketFd();
@@ -81,8 +118,9 @@ bool	Nginx::run(struct timeval	timeout, unsigned int buffer_size)
 	struct sockaddr_in  client_addr;
 	socklen_t			addr_size = sizeof(client_addr);
 	int		fd_num;
-	
 	char	buf[buffer_size + 1];
+
+	unsigned long	timeout_ms = (timeout.tv_sec * 1000) + (timeout.tv_usec / 1000);	
 
 	while (1)
 	{
@@ -102,47 +140,75 @@ bool	Nginx::run(struct timeval	timeout, unsigned int buffer_size)
 			{
 				if (this->servers.count(i) == 1) // server socket event
 				{
+					std::cout << "\033[32m server connection called \033[0m" << std::endl;
 					int client_socket = accept(i, (struct sockaddr*)&client_addr, &addr_size);
-				
+					fcntl(client_socket, F_SETFL, O_NONBLOCK);
+
 					FT_FD_SET(client_socket, &(this->reads));
 					FT_FD_SET(client_socket, &(this->writes));
 					FT_FD_SET(client_socket, &(this->errors));
 					if (this->fd_max < client_socket)
 						this->fd_max = client_socket;
 
-					this->clients[client_socket].setServerSocket(i);
+					this->clients[client_socket].setServerSocketFd(i);
 					this->clients[client_socket].setSocketFd(client_socket);
-					
+					this->clients[client_socket].setLastRequestMs(ft_get_time());
+
 					std::cout << "connected client : " << client_socket << std::endl;
 				}
 				else	// client socket event
 				{
-					int len = read(i, buf, buffer_size);
-					buf[len] = 0;
-					if (len == 0) // close request
+					std::cout << "\033[34m client socket read called \033[0m" << std::endl;
+
+					int		len;
+					bool	is_readable = false;
+
+					this->clients[i].setLastRequestMs(ft_get_time());
+					while ( (len = read(i, buf, buffer_size)) > 0 )
 					{
-						FT_FD_CLR(i, &reads);
-						FT_FD_CLR(i, &writes);
-						FT_FD_CLR(i, &errors);
-						close(i);
-						std::cout << "disconnected : " << i << " in Server ";
-						this->clients.erase(this->clients.find(i));
+						is_readable = true;
+						buf[len] = 0;
+						if (this->clients[i].getStatus() != RESPONSE_READY) // 이미 리스폰스가 준비된 상태라면 그냥 읽고 버린다. (이상한 정보들이 들어오는 것이므로)
+							this->clients[i].getRequest().getRawRequest() += buf;
 					}
-					else // receive request raw data
+					this->clients[i].setStatus(RESPONSE_READY);
+
+					std::cout << getPerfectLocation(this->clients[i].getServerSocketFd(), "default_server", "/2/").getAuthKey() << std::endl;
+
+					if (is_readable == false)
 					{
-						this->clients[i].getRawRequest() += buf;
-						this->clients[i].setStatus(REPSONE_READY);
+						clear_connected_socket(i);
+						if (len == 0)
+							std::cout << "disconnected : " << i << " in Server" << std::endl;
+						else
+							std::cout << "error client : " << i << " in Server" << std::endl;
 					}
 				}
 			}
 			else if (FT_FD_ISSET(i, &cpy_writes))
 			{
-				// always client socket event
-				if (!this->clients[i].getRawRequest().empty() && this->clients[i].getStatus() == REPSONE_READY)
+				//always client socket event
+				if (ft_get_time() - this->clients[i].getLastRequestMs() > timeout_ms)
 				{
-					write(i, this->clients[i].getRawRequest().c_str(), this->clients[i].getRawRequest().size());
-					this->clients[i].getRawRequest().clear();
-					clients[i].setStatus(HEADER_RECEVING);
+					std::cout << "\033[34m connection timeout \033[0m" << std::endl;
+					clear_connected_socket(i);
+					continue ;
+				}
+				if (this->clients[i].getStatus() == RESPONSE_READY)
+				{
+					std::string hard;
+
+					hard += "HTTP/1.1 200 OK\r\n";
+					hard += "Cache-Control: no-cache\r\n";
+					hard += "Server: libnhttpd\r\n";
+					hard += "Date: Wed Jul 4 15:32:03 2012\r\n";
+					hard += "Connection: Keep-Alive\r\n";
+					hard += "Content-Type: application/rdf+xml\r\n";
+					hard += "Content-Length: 0\r\n";
+					hard += "\r\n";
+					write(i, hard.c_str(), hard.size());
+
+					clients[i].setStatus(HEADER_RECEIVING);
 				}
 			}
 			else if (FT_FD_ISSET(i, &cpy_errors))
@@ -157,11 +223,7 @@ bool	Nginx::run(struct timeval	timeout, unsigned int buffer_size)
 				}
 				else // client socket error
 				{
-					FT_FD_CLR(i, &reads);
-					FT_FD_CLR(i, &writes);
-					FT_FD_CLR(i, &errors);
-					close(i);
-					this->clients.erase(this->clients.find(i));
+					clear_connected_socket(i);
 					std::cout << "error client disconnected : " << i << std::endl;
 				}
 			}

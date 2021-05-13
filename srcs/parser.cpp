@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/10 13:52:22 by honlee            #+#    #+#             */
-/*   Updated: 2021/05/13 09:05:53 by honlee           ###   ########.fr       */
+/*   Updated: 2021/05/14 00:06:57 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,8 @@ bool	Config::isReserved(const std::string &src)
 		src == "upload_path" ||
 		src == "auto_index" ||
 		src == "client_body_buffer_size" ||
+		src == "auth_key" ||
+		src == "cgi_extension" ||
 		src == "}" ||
 		src == "{" )
 		return (true);
@@ -172,6 +174,16 @@ bool	Config::makeConfig(const char *path)
 				iter++;
 				instance->servers[key].getLocations()[location_name].setClientBodyBufferSize(ft_atoi(*iter));
 			}
+			else if (*iter == "cgi_extension")
+			{
+				iter++;
+				instance->servers[key].getLocations()[location_name].setCgiExtension(*iter);
+			}
+			else if (*iter == "auth_key")
+			{
+				iter++;
+				instance->servers[key].getLocations()[location_name].setAuthKey(*iter);
+			}
 		}
 	}
 	catch(const char *e)
@@ -195,17 +207,16 @@ void		Config::show()
 /////////////////////////////////////////////////////////
 
 
-
 /////////////////////////////////////////////////////////
 ////////////////// class Client start ///////////////////
 Client::Client()
 {
-	this->server_socket = -1;
+	this->server_socket_fd = -1;
 	this->socket_fd = -1;
-	this->status = NOT_CONNECTED;
+	this->status = HEADER_RECEIVING;
 }
 
-Client::Client(int server_socket, int socket_fd) : server_socket(server_socket), socket_fd(socket_fd)
+Client::Client(int server_socket_fd, int socket_fd) : server_socket_fd(server_socket_fd), socket_fd(socket_fd)
 {
 
 }
@@ -215,15 +226,20 @@ Client::~Client()
 
 }
 
+void	Client::setLastRequestMs(unsigned long last_request_ms)
+{
+	this->last_request_ms = last_request_ms;
+}
+
 void	Client::setStatus(t_status status)
 {
 	this->status = status;
 	return ;
 }
 
-void	Client::setServerSocket(int server_socket)
+void	Client::setServerSocketFd(int server_socket_fd)
 {
-	this->server_socket = server_socket;
+	this->server_socket_fd = server_socket_fd;
 	return ;
 }
 
@@ -233,14 +249,25 @@ void	Client::setSocketFd(int socket_fd)
 	return ;
 }
 
+void	Client::setRemainBody(long long remain_body)
+{
+	this->remain_body = remain_body;
+	return ;
+}
+
 t_status	Client::getStatus()
 {
 	return (this->status);
 }
 
-int			Client::getServerSocket()
+int			Client::getServerSocketFd()
 {
-	return (this->server_socket);
+	return (this->server_socket_fd);
+}
+
+Request		&Client::getRequest()
+{
+	return (this->request);
 }
 
 int		Client::getSocketFd()
@@ -248,19 +275,17 @@ int		Client::getSocketFd()
 	return (this->socket_fd);
 }
 
-std::string &Client::getRawRequest()
+long long		Client::getRemainBody()
 {
-	return (this->raw_request);
+	return (this->remain_body);
 }
 
-std::string &Client::getRawResponse()
+unsigned long	Client::getLastRequestMs()
 {
-	return (this->raw_response);
+	return (this->last_request_ms);
 }
 /////////////////// class Client end ////////////////////
 /////////////////////////////////////////////////////////
-
-
 
 /////////////////////////////////////////////////////////
 ////////////////// class Server start ///////////////////
@@ -271,7 +296,12 @@ Server::Server() : port(-1)
 
 Server::Server(const Server& src)
 {
-	(void)src;
+	this->ip = src.ip;
+	this->port	=	src.port;
+	this->server_name	=	src.server_name;
+	this->error_page	=	src.error_page;
+	this->socket_fd		=	src.socket_fd;
+	this->locations.insert(src.locations.begin(), src.locations.end());
 }
 
 Server &Server::operator=(const Server &src)
@@ -281,7 +311,8 @@ Server &Server::operator=(const Server &src)
 	this->server_name	=	src.server_name;
 	this->error_page	=	src.error_page;
 	this->socket_fd		=	src.socket_fd;
-	this->locations		=	src.locations;
+	this->locations.clear();
+	this->locations.insert(src.locations.begin(), src.locations.end());
 
 	return (*this);
 }
@@ -315,22 +346,22 @@ void	Server::setSocketFd(int socket_fd)
 	return ;
 }
 
-const std::string &Server::getIP()
+const std::string &Server::getIP() const
 {
 	return (this->ip);
 }
 
-const std::string &Server::getServerName()
+const std::string &Server::getServerName() const
 {
 	return (this->server_name);
 }
 
-unsigned short		Server::getPort()
+unsigned short		Server::getPort() const
 {
 	return (this->port);
 }
 
-int					Server::getSocketFd()
+int					Server::getSocketFd() const
 {
 	return (this->socket_fd);
 }
@@ -368,12 +399,31 @@ Location::Location() : client_body_buffer_size(-1)
 
 Location::Location(const Location &src)
 {
-	(void)src;
+	this->root	=	src.root;
+	this->index.assign(src.index.begin(), src.index.end());
+	this->allow_methods.assign(src.allow_methods.begin(), src.allow_methods.end());
+	this->client_body_buffer_size = src.client_body_buffer_size;
+	this->error_page = src.error_page;
+	this->error_number = src.error_number;
+	this->upload_path = src.upload_path;
+	this->auto_index = src.auto_index;
+	this->cgi_extension = src.cgi_extension;
+	this->auth_key = src.auth_key;
 }
 
 Location &Location::operator=(const Location &src)
 {
-	(void)src;
+	this->root	=	src.root;
+	this->index.assign(src.index.begin(), src.index.end());
+	this->allow_methods.assign(src.allow_methods.begin(), src.allow_methods.end());
+	this->client_body_buffer_size = src.client_body_buffer_size;
+	this->error_page = src.error_page;
+	this->error_number = src.error_number;
+	this->upload_path = src.upload_path;
+	this->auto_index = src.auto_index;
+	this->cgi_extension = src.cgi_extension;
+	this->auth_key = src.auth_key;
+
 	return (*this);
 }
 
@@ -410,6 +460,18 @@ void		Location::setUploadPath(const std::string &upload_path)
 void		Location::setAutoIndex(bool auto_index)
 {
 	this->auto_index = auto_index;
+	return ;
+}
+
+void		Location::setCgiExtension(const std::string &cgi_extension)
+{
+	this->cgi_extension = cgi_extension;
+	return ;
+}
+
+void		Location::setAuthKey(const std::string &auth_key)
+{
+	this->auth_key = auth_key;
 	return ;
 }
 
@@ -452,6 +514,17 @@ bool	Location::getAutoIndex()
 {
 	return (this->auto_index);
 }
+
+const std::string &Location::getCgiExtension()
+{
+	return (this->cgi_extension);
+}
+
+const std::string &Location::getAuthKey()
+{
+	return (this->auth_key);
+}
+
 //for test
 void	Location::show()
 {
@@ -461,6 +534,8 @@ void	Location::show()
 	std::cout << "error_number	:	" << this->error_number << std::endl;
 	std::cout << "upload_path	:	" << this->upload_path << std::endl;
 	std::cout << "auto_index	:	" << this->auto_index << std::endl;
+	std::cout << "cgi_extension	:	" << this->cgi_extension << std::endl;
+	std::cout << "auth_key	:	" << this->auth_key << std::endl;
 	std::cout << "index	: ";
 	for (std::list<std::string>::iterator iter = this->index.begin(); iter != this->index.end(); iter++)
 		std::cout << *iter << " ";

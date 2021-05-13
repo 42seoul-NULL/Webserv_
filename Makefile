@@ -6,7 +6,7 @@
 #    By: honlee <honlee@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/04/08 21:20:00 by honlee            #+#    #+#              #
-#    Updated: 2021/05/11 14:37:44 by honlee           ###   ########.fr        #
+#    Updated: 2021/05/13 17:37:31 by honlee           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,6 +14,7 @@ SRCNAME	=		\
 					main.cpp\
 					parser.cpp\
 					nginx.cpp\
+					Request.cpp\
 
 SRCDIR		=		./srcs/
 
@@ -40,7 +41,7 @@ dbg		:
 					lldb webserv -- configs/test.conf
 
 test		:
-					${CC} ${CF} ${LIB_NAME} -o ${NAME}
+					${CC} ${DCF} ${LIB_NAME} -o ${NAME}
 					./webserv configs/test.conf
 
 fclean		:

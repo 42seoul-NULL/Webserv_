@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juyang <juyang@student.42seoul.kr>         +#+  +:+       +#+        */
+/*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/10 18:39:16 by juyang            #+#    #+#             */
-/*   Updated: 2021/05/10 18:39:16 by juyang           ###   ########.fr       */
+/*   Updated: 2021/05/13 19:32:31 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Request.hpp"
 
-Request::Request(void) : accept_charsets(""), accept_language(""), authorization(""), content_length(""), content_type(""), date(""), host(""), referer(""), transfer_encoding(""), user_agent("")
+Request::Request(void) : accept_charsets(""), accept_language(""), authorization(""), content_length(""), content_type(""), date(""), host(""), referer(""), transfer_encoding(""), user_agent(""), raw_request("")
 {
 
 }
@@ -63,12 +63,17 @@ const std::string&	Request::getReferer(void) const
 
 const std::string&	Request::getTransferEncoding(void) const
 {
-	return (this->getTransferEncoding);
+	return (this->transfer_encoding);
 }
 
 const std::string&	Request::getUserAgent(void) const
 {
 	return (this->user_agent);
+}
+
+std::string& Request::getRawRequest()
+{
+	return (this->raw_request);
 }
 
 ///////////////////////////////////////////////////////////////

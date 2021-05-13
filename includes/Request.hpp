@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juyang <juyang@student.42seoul.kr>         +#+  +:+       +#+        */
+/*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/10 18:01:33 by juyang            #+#    #+#             */
-/*   Updated: 2021/05/10 18:01:34 by juyang           ###   ########.fr       */
+/*   Updated: 2021/05/13 17:36:15 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@
 class Request
 {
 	private:
+		std::string method;
+		std::string uri;
 		std::string	accept_charsets;
 		std::string	accept_language;
 		std::string	authorization;
@@ -30,6 +32,8 @@ class Request
 		std::string	referer;
 		std::string	transfer_encoding;
 		std::string	user_agent;
+
+		std::string		raw_request;
 
 	public:
 		Request(void);
@@ -47,6 +51,7 @@ class Request
 		const std::string&	getReferer(void) const;
 		const std::string&	getTransferEncoding(void) const;
 		const std::string&	getUserAgent(void) const;
+		std::string&		getRawRequest(void);
 
 		void	setAcceptCharsets(const std::string& accept_charsets);
 		void	setAcceptLanguage(const std::string& accept_language);

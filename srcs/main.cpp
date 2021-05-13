@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/10 09:32:06 by honlee            #+#    #+#             */
-/*   Updated: 2021/05/11 22:08:57 by honlee           ###   ########.fr       */
+/*   Updated: 2021/05/13 23:37:49 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,15 +17,16 @@
 int	main(int ac, char **av)
 {
 	ac = 0;
+
 	if(!Config::getInstance()->makeConfig(av[1]))
 		return (1);
+	//Config::getInstance()->show();
 
 	Nginx nginx;
 	struct timeval		timeout;
 
-	timeout.tv_sec = 5;
+	timeout.tv_sec = 5; // last request time out 5000ms
 	timeout.tv_usec = 0;
-
 
 	try
 	{

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juyang <juyang@42student.co.kr>            +#+  +:+       +#+        */
+/*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/12 16:40:53 by juyang            #+#    #+#             */
-/*   Updated: 2021/05/12 16:40:54 by juyang           ###   ########.fr       */
+/*   Updated: 2021/05/13 14:44:44 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,7 @@ std::map<std::string, std::string> Response::status_code = {
 	{"599", "Network Connect Timeout Error"},
 };
 
-Response::Response(void) : allow(""), content_language(""), content_length(""), content_location(""), content_type(""), date(""), last_modified(""), location(""), retry_after(""), server(""), transfer_encoding(""), www_authenticate("");
+Response::Response(void) : allow(""), content_language(""), content_length(""), content_location(""), content_type(""), date(""), last_modified(""), location(""), retry_after(""), server(""), transfer_encoding(""), www_authenticate("")
 {
 
 }
