@@ -2,7 +2,7 @@
 
 Request::Request(void) : raw_request(""), method(""), uri(""), http_version(""), accept_charsets(""), accept_language(""), authorization(""), content_length(""), content_type(""), date(""), host(""), referer(""), transfer_encoding(""), user_agent(""), status(0), type(0)
 {
-	this->raw_request = "GET /tutorials/other/top-20-mysql-best-practices/ HTTP/1.1\r\nHost: net.tutsplus.com\r\nUser-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\nAccept-Language: en-us,en;q=0.5\r\nAccept-Encoding: gzip,deflate\r\nAccept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7\r\n\r\n2\r\nab\r\n3\r\nxyz\r\n2\r\nef\r\n0\r\n";
+	// this->raw_request = "GET /tutorials/other/top-20-mysql-best-practices/ HTTP/1.1\r\nHost: net.tutsplus.com\r\nUser-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\nAccept-Language: en-us,en;q=0.5\r\nAccept-Encoding: gzip,deflate\r\nAccept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7\r\n\r\n2\r\nab\r\n3\r\nxyz\r\n2\r\nef\r\n0\r\n";
 }
 
 Request::Request(const Request& src) : raw_request(src.raw_request), method(src.method), uri(src.uri), http_version(src.http_version), accept_language(src.accept_language), authorization(src.authorization), content_length(src.content_length), content_type(src.content_type), date(src.date), host(src.host), referer(src.referer), transfer_encoding(src.transfer_encoding), user_agent(src.user_agent), status(src.status), type(src.type)
@@ -30,6 +30,26 @@ Request&	Request::operator=(const Request& src)
 	this->type = 0;
 
 	return (*this);
+}
+
+std::string&	Request::getRawRequest(void)
+{
+	return (this->raw_request);
+}
+
+const std::string&	Request::getMethod(void) const
+{
+	return (this->method);
+}
+
+const std::string&	Request::getUri(void) const
+{
+	return (this->uri);
+}
+
+const std::string&	Request::getHttpVersion(void) const
+{
+	return (this->http_version);
 }
 
 const std::string&	Request::getAcceptCharsets(void) const
@@ -167,11 +187,11 @@ bool	Request::tryMakeRequest(void)
 	std::size_t	found = this->raw_request.find("\r\n\r\n");
 	int	res = 1;
 
-	if (found != std::string::npos && status == 0)
+	if (found != std::string::npos && this->status == 0)
 	{
 		this->makeStartLine();
 		this->makeRequestHeader();
-		status = 1;
+		this->status = 1;
 		res = bodyCheck();
 		if (res == 0)
 		{
@@ -180,7 +200,7 @@ bool	Request::tryMakeRequest(void)
 			return (true);
 		}
 	}
-	if (status == 1)
+	if (this->status == 1)
 	{
 		this->makeRequestBody();
 		return (isComplete());
@@ -209,8 +229,6 @@ void	Request::makeRequestHeader(void)
 	this->parseReferer();
 	this->parseTransferEncoding();
 	this->parseUserAgent();
-
-	//this->transfer_encoding = "chunked";        테스트 할라고 청크만들어서 해쏘요
 
 	this->temp_body = this->raw_request.substr(this->raw_request.find("\r\n\r\n") + 4);
 	this->raw_request.clear();
@@ -255,7 +273,7 @@ void	Request::parseAcceptCharsets(void)
 	{
 		std::size_t	target_pos = found + key.length();
 
-		this->accept_charsets = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
+		this->accept_charsets = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos);
 	}
 }
 
@@ -268,7 +286,7 @@ void	Request::parseAcceptLanguage(void)
 	{
 		std::size_t target_pos = found + key.length();
 
-		this->accept_language = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
+		this->accept_language = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos);
 	}
 }
 
@@ -281,7 +299,7 @@ void	Request::parseAuthorization(void)
 	{
 		std::size_t target_pos = found + key.length();
 
-		this->authorization = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
+		this->authorization = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos);
 	}
 }
 
@@ -294,7 +312,7 @@ void	Request::parseContentLength(void)
 	{
 		std::size_t target_pos = found + key.length();
 
-		this->content_length = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
+		this->content_length = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos);
 	}
 }
 
@@ -307,7 +325,7 @@ void	Request::parseContentType(void)
 	{
 		std::size_t target_pos = found + key.length();
 
-		this->content_type = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
+		this->content_type = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos);
 	}
 }
 
@@ -320,7 +338,7 @@ void	Request::parseDate(void)
 	{
 		std::size_t target_pos = found + key.length();
 
-		this->date = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
+		this->date = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos);
 	}
 }
 
@@ -333,7 +351,7 @@ void	Request::parseHost(void)
 	{
 		std::size_t target_pos = found + key.length();
 
-		this->host = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
+		this->host = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos);
 	}
 }
 
@@ -346,7 +364,7 @@ void	Request::parseReferer(void)
 	{
 		std::size_t target_pos = found + key.length();
 
-		this->referer = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
+		this->referer = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos);
 	}
 }
 
@@ -359,7 +377,7 @@ void	Request::parseTransferEncoding(void)
 	{
 		std::size_t target_pos = found + key.length();
 
-		this->transfer_encoding = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
+		this->transfer_encoding = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos);
 	}
 }
 
@@ -372,7 +390,7 @@ void	Request::parseUserAgent(void)
 	{
 		std::size_t target_pos = found + key.length();
 
-		this->user_agent = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
+		this->user_agent = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos);
 	}
 }
 
@@ -390,8 +408,9 @@ bool	Request::isComplete(void)
 	if (this->type == 1 && this->temp_body.length() >= (std::size_t)ft_atoi(this->content_length))
 	{
 		this->raw_body += this->temp_body.substr(0, ft_atoi(this->content_length));
-		this->raw_request += this->temp_body.substr((std::size_t)ft_atoi(this->content_length) + 1);
+		this->raw_request += this->temp_body.substr((std::size_t)ft_atoi(this->content_length) ); // 다음 리퀘스트가 한 번에 붙어서 오면 어떻게 처리해야하는가?
 		temp_body.clear();
+		return (true);
 	}
 	else if (this->type == 2)
 	{
@@ -400,7 +419,7 @@ bool	Request::isComplete(void)
 
 		while  (found != std::string::npos)
 		{
-			chunk_size = ft_atoi_hex(this->temp_body.substr(0, found)); // ft_atoi -> ft_atoi_hex 바꿔야함 10진수로 생각하고 테스트 중
+			chunk_size = ft_atoi_hex(this->temp_body.substr(0, found));
 			if (chunk_size == 0)
 			{
 				this->raw_request += this->temp_body.substr(found + 2);
