@@ -12,123 +12,123 @@
 
 #include "../includes/Response.hpp"
 
-std::map<std::string, std::string> Response::mime_type = {
-	{".aac", "audio/aac"},
-	{".abw", "application/x-abiword"},
-	{".arc", "application/octet-stream"},
-	{".avi", "video/x-msvideo"},
-	{".azw", "application/vnd.amazon.ebook"},
-	{".bin", "application/octet-stream"},
-	{".bz", "application/x-bzip"},
-	{".bz2", "application/x-bzip2"},
-	{".csh", "application/x-csh"},
-	{".css", "text/css"},
-	{".csv", "text/csv"},
-	{".doc", "application/msword"},
-	{".epub", "application/epub+zip"},
-	{".gif", "image/gif"},
-	{".htm", "text/html"},
-	{".html", "text/html"},
-	{".ico", "image/x-icon"},
-	{".ics", "text/calendar"},
-	{".jar", "Temporary Redirect"},
-	{".jpeg", "image/jpeg"},
-	{".jpg", "image/jpeg"},
-	{".js", "application/js"},
-	{".json", "application/json"},
-	{".mid", "audio/midi"},
-	{".midi", "audio/midi"},
-	{".mpeg", "video/mpeg"},
-	{".mpkg", "application/vnd.apple.installer+xml"},
-	{".odp", "application/vnd.oasis.opendocument.presentation"},
-	{".ods", "application/vnd.oasis.opendocument.spreadsheet"},
-	{".odt", "application/vnd.oasis.opendocument.text"},
-	{".oga", "audio/ogg"},
-	{".ogv", "video/ogg"},
-	{".ogx", "application/ogg"},
-	{".pdf", "application/pdf"},
-	{".ppt", "application/vnd.ms-powerpoint"},
-	{".rar", "application/x-rar-compressed"},
-	{".rtf", "application/rtf"},
-	{".sh", "application/x-sh"},
-	{".svg", "image/svg+xml"},
-	{".swf", "application/x-shockwave-flash"},
-	{".tar", "application/x-tar"},
-	{".tif", "image/tiff"},
-	{".tiff", "image/tiff"},
-	{".ttf", "application/x-font-ttf"},
-	{".vsd", " application/vnd.visio"},
-	{".wav", "audio/x-wav"},
-	{".weba", "audio/webm"},
-	{".webm", "video/webm"},
-	{".webp", "image/webp"},
-	{".woff", "application/x-font-woff"},
-	{".xhtml", "application/xhtml+xml"},
-	{".xls", "application/vnd.ms-excel"},
-	{".xml", "application/xml"},
-	{".xul", "application/vnd.mozilla.xul+xml"},
-	{".zip", "application/zip"},
-	{".3gp", "video/3gpp audio/3gpp"},
-	{".3g2", "video/3gpp2 audio/3gpp2"},
-	{".7z", "application/x-7z-compressed"},
-};
+// std::map<std::string, std::string> Response::mime_type = {
+// 	{".aac", "audio/aac"},
+// 	{".abw", "application/x-abiword"},
+// 	{".arc", "application/octet-stream"},
+// 	{".avi", "video/x-msvideo"},
+// 	{".azw", "application/vnd.amazon.ebook"},
+// 	{".bin", "application/octet-stream"},
+// 	{".bz", "application/x-bzip"},
+// 	{".bz2", "application/x-bzip2"},
+// 	{".csh", "application/x-csh"},
+// 	{".css", "text/css"},
+// 	{".csv", "text/csv"},
+// 	{".doc", "application/msword"},
+// 	{".epub", "application/epub+zip"},
+// 	{".gif", "image/gif"},
+// 	{".htm", "text/html"},
+// 	{".html", "text/html"},
+// 	{".ico", "image/x-icon"},
+// 	{".ics", "text/calendar"},
+// 	{".jar", "Temporary Redirect"},
+// 	{".jpeg", "image/jpeg"},
+// 	{".jpg", "image/jpeg"},
+// 	{".js", "application/js"},
+// 	{".json", "application/json"},
+// 	{".mid", "audio/midi"},
+// 	{".midi", "audio/midi"},
+// 	{".mpeg", "video/mpeg"},
+// 	{".mpkg", "application/vnd.apple.installer+xml"},
+// 	{".odp", "application/vnd.oasis.opendocument.presentation"},
+// 	{".ods", "application/vnd.oasis.opendocument.spreadsheet"},
+// 	{".odt", "application/vnd.oasis.opendocument.text"},
+// 	{".oga", "audio/ogg"},
+// 	{".ogv", "video/ogg"},
+// 	{".ogx", "application/ogg"},
+// 	{".pdf", "application/pdf"},
+// 	{".ppt", "application/vnd.ms-powerpoint"},
+// 	{".rar", "application/x-rar-compressed"},
+// 	{".rtf", "application/rtf"},
+// 	{".sh", "application/x-sh"},
+// 	{".svg", "image/svg+xml"},
+// 	{".swf", "application/x-shockwave-flash"},
+// 	{".tar", "application/x-tar"},
+// 	{".tif", "image/tiff"},
+// 	{".tiff", "image/tiff"},
+// 	{".ttf", "application/x-font-ttf"},
+// 	{".vsd", " application/vnd.visio"},
+// 	{".wav", "audio/x-wav"},
+// 	{".weba", "audio/webm"},
+// 	{".webm", "video/webm"},
+// 	{".webp", "image/webp"},
+// 	{".woff", "application/x-font-woff"},
+// 	{".xhtml", "application/xhtml+xml"},
+// 	{".xls", "application/vnd.ms-excel"},
+// 	{".xml", "application/xml"},
+// 	{".xul", "application/vnd.mozilla.xul+xml"},
+// 	{".zip", "application/zip"},
+// 	{".3gp", "video/3gpp audio/3gpp"},
+// 	{".3g2", "video/3gpp2 audio/3gpp2"},
+// 	{".7z", "application/x-7z-compressed"},
+// };
 
-std::map<std::string, std::string> Response::status_code = {
-	{"100", "Continue"},
-	{"101", "Switching Protocols"},
-	{"102", "Processing"},
-	{"200", "OK"},
-	{"201", "Created"},
-	{"202", "Accepted"},
-	{"203", "Non-authoritative Information"},
-	{"204", "No Content"},
-	{"205", "Reset Content"},
-	{"206", "Partial Content"},
-	{"207", "Multi-Status"},
-	{"208", "Already Reported"},
-	{"226", "IM Used"},
-	{"300", "Multiple Choices"},
-	{"301", "Moved Permanently"},
-	{"302", "Found"},
-	{"303", "See Other"},
-	{"304", "Not Modified"},
-	{"305", "Use Proxy"},
-	{"307", "Temporary Redirect"},
-	{"308", "Permanent Redirect"},
-	{"400", "Bad Request"},
-	{"401", "Unauthorized"},
-	{"402", "Payment Required"},
-	{"403", "Forbidden"},
-	{"404", "Not found"},
-	{"405", "Method Not Allowed"},
-	{"406", "Not Acceptable"},
-	{"407", "Proxy Authentication Required"},
-	{"408", "Required Timeout"},
-	{"409", "Conflict"},
-	{"410", "Gone"},
-	{"411", "Length Required"},
-	{"412", "Precondition Failed"},
-	{"413", "Request Entity Too Large"},
-	{"414", "Request URI Too Long"},
-	{"415", "Unsupported Media Type"},
-	{"416", "Requested Range Not Satisfiable"},
-	{"417", "Expectation Failed"},
-	{"418", "IM_A_TEAPOT"},
-	{"500", "Internal Server Error"},
-	{"501", "Not Implemented"},
-	{"502", "Bad Gateway"},
-	{"503", "Service Unavailable"},
-	{"504", "Gateway Timeout"},
-	{"505", "HTTP Version Not Supported"},
-	{"506", "Variant Also Negotiates"},
-	{"507", "Insufficient Storage"},
-	{"508", "Loop Detected"},
-	{"510", "Not Extened"},
-	{"511", "Network Authentication Required"},
-	{"599", "Network Connect Timeout Error"},
-};
+// std::map<std::string, std::string> Response::status_code = {
+// 	{"100", "Continue"},
+// 	{"101", "Switching Protocols"},
+// 	{"102", "Processing"},
+// 	{"200", "OK"},
+// 	{"201", "Created"},
+// 	{"202", "Accepted"},
+// 	{"203", "Non-authoritative Information"},
+// 	{"204", "No Content"},
+// 	{"205", "Reset Content"},
+// 	{"206", "Partial Content"},
+// 	{"207", "Multi-Status"},
+// 	{"208", "Already Reported"},
+// 	{"226", "IM Used"},
+// 	{"300", "Multiple Choices"},
+// 	{"301", "Moved Permanently"},
+// 	{"302", "Found"},
+// 	{"303", "See Other"},
+// 	{"304", "Not Modified"},
+// 	{"305", "Use Proxy"},
+// 	{"307", "Temporary Redirect"},
+// 	{"308", "Permanent Redirect"},
+// 	{"400", "Bad Request"},
+// 	{"401", "Unauthorized"},
+// 	{"402", "Payment Required"},
+// 	{"403", "Forbidden"},
+// 	{"404", "Not found"},
+// 	{"405", "Method Not Allowed"},
+// 	{"406", "Not Acceptable"},
+// 	{"407", "Proxy Authentication Required"},
+// 	{"408", "Required Timeout"},
+// 	{"409", "Conflict"},
+// 	{"410", "Gone"},
+// 	{"411", "Length Required"},
+// 	{"412", "Precondition Failed"},
+// 	{"413", "Request Entity Too Large"},
+// 	{"414", "Request URI Too Long"},
+// 	{"415", "Unsupported Media Type"},
+// 	{"416", "Requested Range Not Satisfiable"},
+// 	{"417", "Expectation Failed"},
+// 	{"418", "IM_A_TEAPOT"},
+// 	{"500", "Internal Server Error"},
+// 	{"501", "Not Implemented"},
+// 	{"502", "Bad Gateway"},
+// 	{"503", "Service Unavailable"},
+// 	{"504", "Gateway Timeout"},
+// 	{"505", "HTTP Version Not Supported"},
+// 	{"506", "Variant Also Negotiates"},
+// 	{"507", "Insufficient Storage"},
+// 	{"508", "Loop Detected"},
+// 	{"510", "Not Extened"},
+// 	{"511", "Network Authentication Required"},
+// 	{"599", "Network Connect Timeout Error"},
+// };
 
-Response::Response(void) : allow(""), content_language(""), content_length(""), content_location(""), content_type(""), date(""), last_modified(""), location(""), retry_after(""), server(""), transfer_encoding(""), www_authenticate("");
+Response::Response(void) : allow(""), content_language(""), content_length(""), content_location(""), content_type(""), date(""), last_modified(""), location(""), retry_after(""), server(""), transfer_encoding(""), www_authenticate("")
 {
 
 }
@@ -292,20 +292,42 @@ void	Response::initResponse(void)
 	this->www_authenticate = "";
 }
 
-void	Response::createResponse(const Request& request)
+void	Response::createResponse(const Request& request, const Server& server)
 {
-	
+	this->generateAllow(request, const_cast<Server &>(server));
+	this->generateContentLanguage(request);
+	this->generateContentLength(request);
+	this->generateContentLocation(request);
+	this->generateContentType(request);
+	this->generateDate(request);
+	this->generateLastModified(request);
+	this->generateLocation(request, server);
+	this->generateRetryAfter(request);
+	this->generateServer(request);
+	this->generateTransferEncoding(request);
+	this->generateWWWAuthenticate(request);
 }
 
 void	Response::generateAllow(const Request& request, Server& server)
 {
-	for (std::map<std::string, Location>::iterator location_iter = server.getLocations().begin(); location_iter != server.getLocations().begin(); location_iter++)
+	std::map<std::string, Location>::iterator location_iter = server.getLocations().find(request.getUri());
+	if (location_iter != server.getLocations().end())
 	{
-		for (std::list<std::string>::iterator iter = location_iter->second.getAllowMethods().begin(); iter != location_iter->second.getAllowMethods().end(); iter++)
+		std::list<std::string>::iterator iter = location_iter->second.getAllowMethods().begin();
+		for (; iter != location_iter->second.getAllowMethods().end(); iter++)
 		{
 			// Request에서 URI 처리 후 맞는 Location_Iter Key 찾은 후 작성
+			this->allow += *iter;
+			if (iter != --location_iter->second.getAllowMethods().end())
+			{
+				this->allow += ", ";
+			}
 		}
+	} else
+	{
+		std::cout << "Not found Server" << std::endl;
 	}
+	
 }
 
 void	Response::generateContentLanguage(const Request& request)
@@ -320,6 +342,9 @@ void	Response::generateContentLength(const Request& request)
 {
 	// Body를 모두 고려 한 후 Chunked 에 대한 규칙을 조금 더 논의 한 후 작성해야 할 필요가 있음
 	// Entity 에 대한 정의와 규칙이 아직 모호함.
+
+	(void)request;
+	this->content_length += "";
 }
 
 void	Response::generateContentLocation(const Request& request)
@@ -332,7 +357,10 @@ void	Response::generateContentLocation(const Request& request)
 	// Accept: application/xml -> /documents/foo.xml
 	// Accept: application/json -> /documents/foo.json
 
-	this->content_location += "/";
+	// 콘텐츠 협상에 대한 절대적 경로
+	(void)request;
+
+	this->content_location += "/tests/www/index.html";
 }
 
 void	Response::generateContentType(const Request& request)
@@ -348,6 +376,15 @@ void	Response::generateDate(const Request& request)
 {
 	// Date 함수 살펴 본 후 작성하자.
 	// 메시지가 만들어진 날짜, 객체 생성 시의 시간? 보내기 전 Raw화 하기전의 시간?
+	time_t t;
+	char buffer[4096];
+	struct tm* timeinfo;
+	(void)request;
+
+	t = time(NULL);
+	timeinfo = localtime(&t);
+	strftime(buffer, 4096, "%a, %d %b %Y %H:%M:%S GMT", timeinfo);
+	this->date += std::string(buffer);
 }
 
 void	Response::generateLastModified(const Request& request)
@@ -355,12 +392,29 @@ void	Response::generateLastModified(const Request& request)
 	// 파일의 최종 수정 시간.
 	// stat 함수 체크하자.
 	// URI 에 대한 파싱 진행 완료 후 stat 함수를 통해 정보를 읽은 후 수정 날짜를 규격에 맞춰서 작성하면 될듯
+	struct stat	sb;
+	struct tm*	timeinfo;
+	char buffer[4096];
+	(void)request;
+
+	if (stat("tests/www/index.html", &sb) == -1)
+	{
+		std::cout << "err" << std::endl;
+		return ;
+	}
+	timeinfo = localtime(&sb.st_mtime);
+	strftime(buffer, 4096, "%a, %d %b %Y %H:%M:%S GMT", timeinfo); // 연도 잘 안나옴
+	this->last_modified = std::string(buffer);
 }
 
 void	Response::generateLocation(const Request& request, const Server& server)
 {
 	// 처리 후 완료하는 리다이렉선 URI를 작성하면 될듯.
 	// Server 내의 Location 중에서 선택 후 추가 URI 작성하는 방향이 규칙 선정에 효율적일 듯 함
+	// 아직 리다이렉션 정리가 안됐으니 테스트 케이스 그대로 location 지정하고자 함
+	(void)request;
+	(void)server;
+	this->location += "/tests/www/index.html";
 }
 
 void	Response::generateRetryAfter(const Request& request)
@@ -369,6 +423,8 @@ void	Response::generateRetryAfter(const Request& request)
 	// 대부분의 브라우저에서는 무시한다.
 	// 어느 정도의 틀만 정한 후 보내주면 될 듯한다.
 	// 에러 상황일 때 에러 페이지를 띄워주고 Location으로 Redirection 하기 전의 딜레이 정도로만 생각하자.
+	(void)request;
+	this->retry_after += "100";
 }
 
 void	Response::generateServer(const Request& request)
@@ -376,6 +432,7 @@ void	Response::generateServer(const Request& request)
 	// 사실상 프로젝트 이름 수준이다.
 	// 추후 회의를 위해 좋은 이름을 선정 해 보자
 
+	(void)request;
 	this->server = "NoBusWebserv/1.0 HTTP/1.1";
 }
 
@@ -384,6 +441,7 @@ void	Response::generateTransferEncoding(const Request& request)
 	// chunked 에 대한 기준이 필요함. chunked 해서 Response 까지 보낼 것인지 선택하는게 관건
 	// default 로 gzip
 
+	(void)request;
 	this->transfer_encoding += "gzip";
 }
 
@@ -394,7 +452,29 @@ void	Response::generateWWWAuthenticate(const Request& request)
 	// config의 auth_basic 관련 해서 회의 필요.
 	// 우리는 거대한 서비스 작성이 아니니 basic type 으로 고정
 
-	this->www_authenticate += "basic ";
-	this->www_authenticate += "realm=";
+	(void)request;
+	this->www_authenticate += "basic";
+	// this->www_authenticate += "realm=";
 	// 여기서 auth_basic을 추가하면 될 듯함.
+}
+
+void	Response::generateRawResponseHeader(void) const
+{
+	std::string	raw_header = std::string("");
+
+	raw_header += "Allow: " + this->allow + "\r\n";
+	raw_header += "Content-Language: " + this->content_language + "\r\n";
+	raw_header += "Content-Length: " + this->content_length + "\r\n";
+	raw_header += "Content-Location: " + this->content_location + "\r\n";
+	raw_header += "Content-Type: " + this->content_type + "\r\n";
+	raw_header += "Date: " + this->date + "\r\n";
+	raw_header += "Last-Modified: " + this->last_modified + "\r\n";
+	raw_header += "Location: " + this->location + "\r\n";
+	raw_header += "Retry-After: " + this->retry_after + "\r\n";
+	raw_header += "Server: " + this->server + "\r\n";
+	raw_header += "Transfer-Encoding: " + this->transfer_encoding + "\r\n";
+	raw_header += "WWW-Authenticate: " + this->www_authenticate + "\r\n";
+	raw_header += "\r\n";
+
+	std::cout << raw_header;
 }

@@ -253,7 +253,7 @@ void	Request::parseUri(void)
 	std::string start_line = this->raw_request.substr(0, found);
 	std::size_t start_pos = start_line.find(' ');
 
-	this->uri = start_line.substr(start_pos + 1, start_line.find_last_of(' ') - start_pos);
+	this->uri = start_line.substr(start_pos + 1, start_line.find_last_of(' ') - start_pos - 1);
 }
 
 void	Request::parseHttpVersion(void)

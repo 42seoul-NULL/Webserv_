@@ -15,11 +15,14 @@
 
 # include <iostream>
 # include <map>
+# include <ctime>
+# include <sys/stat.h>
 # include "Request.hpp"
 # include "parser.hpp"
 
 class Request;
 class Server;
+class Location;
 
 class Response
 {
@@ -74,7 +77,7 @@ class Response
 		void	setWWWAuthenticate(const std::string& www_authenticate);
 
 		void	initResponse(void);
-		void	createResponse(const Request& request);
+		void	createResponse(const Request& request, const Server& server);
 
 		void	generateAllow(const Request& request, Server& server);
 		void	generateContentLanguage(const Request& request);
@@ -89,6 +92,7 @@ class Response
 		void	generateTransferEncoding(const Request& request);
 		void	generateWWWAuthenticate(const Request& request);
 
+		void	generateRawResponseHeader(void) const;
 };
 
 #endif
