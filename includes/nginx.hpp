@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   nginx.hpp                                          :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/05/11 14:37:04 by honlee            #+#    #+#             */
-/*   Updated: 2021/05/13 23:52:53 by honlee           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef NGINX_HPP
 # define NGINX_HPP
 
@@ -21,6 +9,10 @@
 # include <sys/socket.h>
 # include <sys/time.h>
 # include <sys/select.h>
+# include <errno.h>
+# include <string>
+# include <fcntl.h>
+# include <sys/stat.h>
 # include "parser.hpp"
 
 class Nginx

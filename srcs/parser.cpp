@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   parser.cpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/05/10 13:52:22 by honlee            #+#    #+#             */
-/*   Updated: 2021/05/14 00:06:57 by honlee           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../includes/parser.hpp"
 
 /////////////////////////////////////////////////////////
@@ -213,7 +201,7 @@ Client::Client()
 {
 	this->server_socket_fd = -1;
 	this->socket_fd = -1;
-	this->status = HEADER_RECEIVING;
+	this->status = REQUEST_RECEIVING;
 }
 
 Client::Client(int server_socket_fd, int socket_fd) : server_socket_fd(server_socket_fd), socket_fd(socket_fd)

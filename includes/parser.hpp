@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   parse.hpp                                      :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/05/06 15:58:37 by honlee            #+#    #+#             */
-/*   Updated: 2021/05/06 15:59:24 by honlee           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef CONFIG_HPP
 # define CONFIG_HPP
 
@@ -27,8 +15,7 @@
 
 typedef enum			t_status
 {
-	HEADER_RECEIVING,
-	BODY_RECEIVING,
+	REQUEST_RECEIVING,
 	RESPONSE_READY
 }						t_status;
 

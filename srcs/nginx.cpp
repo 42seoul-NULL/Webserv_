@@ -1,19 +1,4 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   nginx.cpp                                          :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/05/11 18:26:40 by honlee            #+#    #+#             */
-/*   Updated: 2021/05/14 00:21:58 by honlee           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../includes/nginx.hpp"
-#include <errno.h>
-#include <string>
-#include <fcntl.h>
 
 Nginx::Nginx() : fd_max(-1)
 {
@@ -78,7 +63,6 @@ bool	Nginx::initServers(int queue_size)
 		}
 
 		struct sockaddr_in  server_addr;
-
 		iter->second.setSocketFd(socket(PF_INET, SOCK_STREAM, 0));
 
 		ft_memset(&server_addr, 0, sizeof(server_addr));
@@ -168,13 +152,10 @@ bool	Nginx::run(struct timeval	timeout, unsigned int buffer_size)
 					{
 						is_readable = true;
 						buf[len] = 0;
-						if (this->clients[i].getStatus() != RESPONSE_READY) // 이미 리스폰스가 준비된 상태라면 그냥 읽고 버린다. (이상한 정보들이 들어오는 것이므로)
-							this->clients[i].getRequest().getRawRequest() += buf;
+						this->clients[i].getRequest().getRawRequest() += buf; // 무조건 더한다. (다음 리퀘스트가 미리 와있을 수 있다.)
 					}
 					this->clients[i].setStatus(RESPONSE_READY);
-
-					std::cout << getPerfectLocation(this->clients[i].getServerSocketFd(), "default_server", "/2/").getAuthKey() << std::endl;
-
+					
 					if (is_readable == false)
 					{
 						clear_connected_socket(i);
@@ -198,17 +179,40 @@ bool	Nginx::run(struct timeval	timeout, unsigned int buffer_size)
 				{
 					std::string hard;
 
+					int send_file_fd = open("tests/www/index.html", O_RDONLY);
+					if (send_file_fd < 0)
+					{
+						std::cerr << "file open error" << std::endl;
+						clients[i].setStatus(REQUEST_RECEIVING);
+						continue ;	
+					}
+					struct stat sb;
+					int ret;
+
+					if (fstat(send_file_fd, &sb) == -1) 
+					{ 
+						std::cerr << "fstat error" << std::endl;
+						clients[i].setStatus(REQUEST_RECEIVING);
+						continue ;
+					}
+
 					hard += "HTTP/1.1 200 OK\r\n";
 					hard += "Cache-Control: no-cache\r\n";
 					hard += "Server: libnhttpd\r\n";
 					hard += "Date: Wed Jul 4 15:32:03 2012\r\n";
 					hard += "Connection: Keep-Alive\r\n";
-					hard += "Content-Type: application/rdf+xml\r\n";
-					hard += "Content-Length: 0\r\n";
+					hard += "Content-Type: application/rdf+html\r\n";
+					hard += "Content-Length: " + ft_itoa(sb.st_size) + "\r\n";
 					hard += "\r\n";
+
 					write(i, hard.c_str(), hard.size());
 
-					clients[i].setStatus(HEADER_RECEIVING);
+					while ( (ret = read(send_file_fd, buf, buffer_size) ) > 0 )
+					{
+						write(i, buf, ret);
+					}
+
+					clients[i].setStatus(REQUEST_RECEIVING);
 				}
 			}
 			else if (FT_FD_ISSET(i, &cpy_errors))
