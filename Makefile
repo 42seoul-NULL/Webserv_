@@ -2,7 +2,7 @@ SRCNAME	=		\
 					main.cpp\
 					parser.cpp\
 					Request.cpp\
-					nginx.cpp\
+					nginx.cpp
 
 SRCDIR		=		./srcs/
 
