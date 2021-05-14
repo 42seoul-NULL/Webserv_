@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juyang <juyang@student.42seoul.kr>         +#+  +:+       +#+        */
+/*   By: kilee <kilee@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/10 18:01:33 by juyang            #+#    #+#             */
-/*   Updated: 2021/05/10 18:01:34 by juyang           ###   ########.fr       */
+/*   Updated: 2021/05/14 11:45:44 by kilee            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,10 +85,12 @@ class Request
 
 		void	initRequest(void);
 
-		int		generateRequest(void);
-		void	generateStartLine(void);
-		void	generateRequestHeader(void);
-		void	generateRequestBody(void);
+		bool	tryMakeRequest(void);
+
+	private:
+		void	makeStartLine(void);
+		void	tryMakeRequestHeader(void);
+		void	tryMakeRequestBody(void);
 
 		void	parseMethod(void);
 		void	parseUri(void);
@@ -108,6 +110,7 @@ class Request
 		bool	bodyCheck(void);
 		bool	isComplete(void);
 
+	public:
 		std::string	createRawRequest(void) const;
 		void	bodyPrint(void);
 };

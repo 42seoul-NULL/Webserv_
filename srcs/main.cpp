@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juyang <juyang@student.42seoul.kr>         +#+  +:+       +#+        */
+/*   By: kilee <kilee@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/13 16:34:00 by juyang            #+#    #+#             */
-/*   Updated: 2021/05/13 16:34:01 by juyang           ###   ########.fr       */
+/*   Updated: 2021/05/14 11:45:44 by kilee            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,18 +18,18 @@ int	main(int ac, char **av)
 {
 	(void)ac;
 	(void)av;
-	
+
 	Request	test_request;
 
-	while (test_request.generateRequest())
+	while (test_request.tryMakeRequest())
 		;
 
-	// test_request.generateStartLine();
-	// while (test_request.generateRequestHeader() == -1)
+	// test_request.makeStartLine();
+	// while (test_request.tryMakeRequestHeader() == -1)
 	// {
-	// 	read() -> raw_request -> 
+	// 	read() -> raw_request ->
 	// };
-	// test_request.generateRequestBody();
+	// test_request.tryMakeRequestBody();
 	std::cout << test_request.createRawRequest();
 
 	// std::cout << ft_strlen("hello\n!!") << std::endl;

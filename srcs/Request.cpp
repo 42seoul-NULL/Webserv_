@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juyang <juyang@student.42seoul.kr>         +#+  +:+       +#+        */
+/*   By: kilee <kilee@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/10 18:39:16 by juyang            #+#    #+#             */
-/*   Updated: 2021/05/10 18:39:16 by juyang           ###   ########.fr       */
+/*   Updated: 2021/05/14 11:51:34 by kilee            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,10 +151,10 @@ void	Request::setUserAgent(const std::string& user_agent)
 
 void	Request::initRequest(void)
 {
-	this->method = "":
-	this->uri = "":
+	this->method = "";
+	this->uri = "";
 	this->http_version = "";
-	
+
 	this->accept_charsets = "";
 	this->accept_language = "";
 	this->authorization = "";
@@ -174,40 +174,40 @@ void	Request::initRequest(void)
 	type = 0;
 }
 
-int	Request::generateRequest(void)
+bool	Request::tryMakeRequest(void)
 {
 	std::size_t	found = this->raw_request.find("\r\n\r\n");
 	int	res = 1;
 
 	if (found != std::string::npos && status == 0)
 	{
-		this->generateStartLine();
-		this->generateRequestHeader();
+		this->makeStartLine();
+		this->tryMakeRequestHeader();
 		status = 1;
 		res = bodyCheck();
 		if (res == 0)
 		{
 			this->raw_request = this->temp_body;
 			this->temp_body.clear();
-			return (0);
+			return (true);
 		}
 	}
 	if (status == 1)
 	{
-		this->generateRequestBody();
+		this->tryMakeRequestBody();
 		return (isComplete());
 	}
-	return (1);
+	return (false);
 }
 
-void	Request::generateStartLine(void)
+void	Request::makeStartLine(void)
 {
 	this->parseMethod();
 	this->parseUri();
 	this->parseHttpVersion();
 }
 
-void	Request::generateRequestHeader(void)
+void	Request::tryMakeRequestHeader(void)
 {
 	this->raw_header = this->raw_request.substr(this->raw_request.find("\r\n") + 1, this->raw_request.find("\r\n\r\n"));
 
@@ -228,7 +228,7 @@ void	Request::generateRequestHeader(void)
 	this->raw_request.clear();
 }
 
-void	Request::generateRequestBody(void)
+void	Request::tryMakeRequestBody(void)
 {
 	this->temp_body += raw_request;
 }
@@ -254,7 +254,7 @@ void	Request::parseHttpVersion(void)
 {
 	std::size_t	found = this->raw_request.find("\r\n");
 	std::string start_line = this->raw_request.substr(0, found);
-	
+
 	this->http_version = start_line.substr(start_line.find_last_of(' ') + 1);
 }
 
@@ -279,7 +279,7 @@ void	Request::parseAcceptLanguage(void)
 	if (found != std::string::npos)
 	{
 		std::size_t target_pos = found + key.length();
-		
+
 		this->accept_language = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
 	}
 }
@@ -292,7 +292,7 @@ void	Request::parseAuthorization(void)
 	if (found != std::string::npos)
 	{
 		std::size_t target_pos = found + key.length();
-		
+
 		this->authorization = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
 	}
 }
@@ -305,7 +305,7 @@ void	Request::parseContentLength(void)
 	if (found != std::string::npos)
 	{
 		std::size_t target_pos = found + key.length();
-		
+
 		this->content_length = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
 	}
 }
@@ -318,7 +318,7 @@ void	Request::parseContentType(void)
 	if (found != std::string::npos)
 	{
 		std::size_t target_pos = found + key.length();
-		
+
 		this->content_type = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
 	}
 }
@@ -331,7 +331,7 @@ void	Request::parseDate(void)
 	if (found != std::string::npos)
 	{
 		std::size_t target_pos = found + key.length();
-		
+
 		this->date = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
 	}
 }
@@ -344,7 +344,7 @@ void	Request::parseHost(void)
 	if (found != std::string::npos)
 	{
 		std::size_t target_pos = found + key.length();
-		
+
 		this->host = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
 	}
 }
@@ -357,7 +357,7 @@ void	Request::parseReferer(void)
 	if (found != std::string::npos)
 	{
 		std::size_t target_pos = found + key.length();
-		
+
 		this->referer = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
 	}
 }
@@ -370,7 +370,7 @@ void	Request::parseTransferEncoding(void)
 	if (found != std::string::npos)
 	{
 		std::size_t target_pos = found + key.length();
-		
+
 		this->transfer_encoding = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
 	}
 }
@@ -383,7 +383,7 @@ void	Request::parseUserAgent(void)
 	if (found != std::string::npos)
 	{
 		std::size_t target_pos = found + key.length();
-		
+
 		this->user_agent = this->raw_header.substr(target_pos, this->raw_header.find("\r\n", target_pos) - target_pos + 1);
 	}
 }
@@ -402,7 +402,7 @@ bool	Request::isComplete(void)
 	if (this->type == 1 && this->temp_body.length() >= (std::size_t)ft_atoi(this->content_length))
 	{
 		this->raw_body += this->temp_body.substr(0, ft_atoi(this->content_length));
-		this->raw_request += this->temp_body.substr(this->content_length + 1);
+		this->raw_request += this->temp_body.substr((std::size_t)ft_atoi(this->content_length) + 1);
 		temp_body.clear();
 	}
 	else if (this->type == 2)
@@ -417,7 +417,7 @@ bool	Request::isComplete(void)
 			{
 				this->raw_request += this->temp_body.substr(found + 2);
 				this->temp_body.clear();
-				return (false);
+				return (true);
 			}
 			this->temp_body = this->temp_body.substr(found + 2);
 			if (this->temp_body.length() >= chunk_size)
@@ -429,7 +429,7 @@ bool	Request::isComplete(void)
 			found = this->temp_body.find("\r\n");
 		}
 	}
-	return (true);
+	return (false);
 }
 
 std::string	Request::createRawRequest(void) const
