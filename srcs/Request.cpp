@@ -187,7 +187,8 @@ int	Request::generateRequest(void)
 		res = bodyCheck();
 		if (res == 0)
 		{
-			this->raw_request = temp_body;
+			this->raw_request = this->temp_body;
+			this->temp_body.clear();
 			return (0);
 		}
 	}
