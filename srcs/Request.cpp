@@ -151,6 +151,10 @@ void	Request::setUserAgent(const std::string& user_agent)
 
 void	Request::initRequest(void)
 {
+	this->method = "":
+	this->uri = "":
+	this->http_version = "";
+	
 	this->accept_charsets = "";
 	this->accept_language = "";
 	this->authorization = "";
@@ -161,6 +165,13 @@ void	Request::initRequest(void)
 	this->referer = "";
 	this->transfer_encoding = "";
 	this->user_agent = "";
+
+	this->raw_header = "";
+	this->raw_body = "";
+	this->temp_body = "";
+
+	status = 0;
+	type = 0;
 }
 
 int	Request::generateRequest(void)
@@ -174,8 +185,13 @@ int	Request::generateRequest(void)
 		this->generateRequestHeader();
 		status = 1;
 		res = bodyCheck();
+		if (res == 0)
+		{
+			this->raw_request = temp_body;
+			return (0);
+		}
 	}
-	else if (status == 1)
+	if (status == 1)
 	{
 		this->generateRequestBody();
 		return (isComplete());
@@ -207,7 +223,7 @@ void	Request::generateRequestHeader(void)
 
 	//this->transfer_encoding = "chunked";        테스트 할라고 청크만들어서 해쏘요
 
-	this->temp_body += this->raw_request.substr(this->raw_request.find("\r\n\r\n") + 4);
+	this->temp_body = this->raw_request.substr(this->raw_request.find("\r\n\r\n") + 4);
 	this->raw_request.clear();
 }
 
@@ -377,15 +393,16 @@ bool	Request::bodyCheck(void)
 		this->type = 2;
 	else if (this->content_length != "")
 		this->type = 1;
-	return (type);
+	return (this->type);
 }
 
 bool	Request::isComplete(void)
 {
 	if (this->type == 1 && this->temp_body.length() >= (std::size_t)ft_atoi(this->content_length))
 	{
-		this->raw_body += this->temp_body;
-		this->temp_body.clear();
+		this->raw_body += this->temp_body.substr(0, ft_atoi(this->content_length));
+		this->raw_request += this->temp_body.substr(this->content_length + 1);
+		temp_body.clear();
 	}
 	else if (this->type == 2)
 	{
@@ -394,14 +411,18 @@ bool	Request::isComplete(void)
 
 		while  (found != std::string::npos)
 		{
-			chunk_size = ft_atoi(this->temp_body.substr(0, found)); // ft_atoi -> ft_atoi_hex 바꿔야함 10진수로 생각하고 테스트 중
+			chunk_size = ft_atoi_hex(this->temp_body.substr(0, found)); // ft_atoi -> ft_atoi_hex 바꿔야함 10진수로 생각하고 테스트 중
 			if (chunk_size == 0)
+			{
+				this->raw_request += this->temp_body.substr(found + 2);
+				this->temp_body.clear();
 				return (false);
+			}
 			this->temp_body = this->temp_body.substr(found + 2);
 			if (this->temp_body.length() >= chunk_size)
 			{
 				found = this->temp_body.find("\r\n");
-				raw_body += this->temp_body.substr(0, found);
+				this->raw_body += this->temp_body.substr(0, found);
 				this->temp_body = this->temp_body.substr(found + 2);
 			}
 			found = this->temp_body.find("\r\n");
