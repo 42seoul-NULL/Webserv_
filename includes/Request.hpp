@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Request.hpp                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: kilee <kilee@student.42.fr>                +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/05/10 18:01:33 by juyang            #+#    #+#             */
-/*   Updated: 2021/05/14 11:45:44 by kilee            ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef REQUEST_HPP
 # define REQUEST_HPP
 
@@ -84,13 +72,11 @@ class Request
 		void	setUserAgent(const std::string& user_agent);
 
 		void	initRequest(void);
-
 		bool	tryMakeRequest(void);
-
 	private:
 		void	makeStartLine(void);
-		void	tryMakeRequestHeader(void);
-		void	tryMakeRequestBody(void);
+		void	makeRequestHeader(void);
+		void	makeRequestBody(void);
 
 		void	parseMethod(void);
 		void	parseUri(void);
@@ -110,6 +96,7 @@ class Request
 		bool	bodyCheck(void);
 		bool	isComplete(void);
 
+// 테스트용 메소드
 	public:
 		std::string	createRawRequest(void) const;
 		void	bodyPrint(void);

@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Request.cpp                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: kilee <kilee@student.42.fr>                +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/05/10 18:39:16 by juyang            #+#    #+#             */
-/*   Updated: 2021/05/14 11:51:34 by kilee            ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../includes/Request.hpp"
 
 Request::Request(void) : raw_request(""), method(""), uri(""), http_version(""), accept_charsets(""), accept_language(""), authorization(""), content_length(""), content_type(""), date(""), host(""), referer(""), transfer_encoding(""), user_agent(""), status(0), type(0)
@@ -182,7 +170,7 @@ bool	Request::tryMakeRequest(void)
 	if (found != std::string::npos && status == 0)
 	{
 		this->makeStartLine();
-		this->tryMakeRequestHeader();
+		this->makeRequestHeader();
 		status = 1;
 		res = bodyCheck();
 		if (res == 0)
@@ -194,7 +182,7 @@ bool	Request::tryMakeRequest(void)
 	}
 	if (status == 1)
 	{
-		this->tryMakeRequestBody();
+		this->makeRequestBody();
 		return (isComplete());
 	}
 	return (false);
@@ -207,7 +195,7 @@ void	Request::makeStartLine(void)
 	this->parseHttpVersion();
 }
 
-void	Request::tryMakeRequestHeader(void)
+void	Request::makeRequestHeader(void)
 {
 	this->raw_header = this->raw_request.substr(this->raw_request.find("\r\n") + 1, this->raw_request.find("\r\n\r\n"));
 
@@ -228,7 +216,7 @@ void	Request::tryMakeRequestHeader(void)
 	this->raw_request.clear();
 }
 
-void	Request::tryMakeRequestBody(void)
+void	Request::makeRequestBody(void)
 {
 	this->temp_body += raw_request;
 }
