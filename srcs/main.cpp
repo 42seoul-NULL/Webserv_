@@ -1,23 +1,26 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/05/10 09:32:06 by honlee            #+#    #+#             */
-/*   Updated: 2021/05/11 12:51:58 by honlee           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../libft_cpp/libft.hpp"
 #include "../includes/parser.hpp"
+#include "../includes/Request.hpp"
 
 int	main(int ac, char **av)
 {
+	(void)ac;
+	(void)av;
 
-	ac = 0;
-	if(!Config::getInstance()->makeConfig(av[1]))
-		return (1);
-	Config::getInstance()->show();
+	Request	test_request;
+
+	while (test_request.tryMakeRequest())
+		;
+
+	// test_request.makeStartLine();
+	// while (test_request.makeRequestHeader() == -1)
+	// {
+	// 	read() -> raw_request ->
+	// };
+	// test_request.makeRequestBody();
+	std::cout << test_request.createRawRequest();
+
+	// std::cout << ft_strlen("hello\n!!") << std::endl;
+	std::cout << "\n\n<body>\n";
+	test_request.bodyPrint();
 }
