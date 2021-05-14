@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   parse.hpp                                      :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/05/06 15:58:37 by honlee            #+#    #+#             */
-/*   Updated: 2021/05/06 15:59:24 by honlee           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef CONFIG_HPP
 # define CONFIG_HPP
 
@@ -23,6 +11,13 @@
 # include <vector>
 # include "../libft_cpp/libft.hpp"
 # include <queue>
+# include "Request.hpp"
+
+typedef enum			t_status
+{
+	REQUEST_RECEIVING,
+	RESPONSE_READY
+}						t_status;
 
 class Location;
 class Server;
@@ -49,6 +44,35 @@ class Config
 		void	show();
 };
 
+class Client
+{
+	private	:
+		t_status		status;
+		int				server_socket_fd;
+		int				socket_fd;
+		Request			request;
+		long long		remain_body;
+		unsigned long	last_request_ms;
+
+	public	:
+		Client();
+		Client(int server_socket_fd, int socket_fd);
+		~Client();
+
+		void		setSocketFd(int socket_fd);
+		void		setServerSocketFd(int server_socket_fd);
+		void		setStatus(t_status status);
+		void		setRemainBody(long long remain_body);
+		void		setLastRequestMs(unsigned long last_request_ms);
+
+		int			getSocketFd();
+		int			getServerSocketFd();
+		Request		&getRequest();
+		t_status	getStatus();
+		long long	getRemainBody();
+		unsigned long getLastRequestMs();
+};
+
 class Server
 {
 	private	:
@@ -56,6 +80,7 @@ class Server
 		unsigned short	port;
 		std::string		server_name;
 		std::string		error_page;
+		int				socket_fd;
 		std::map<std::string, Location> locations;
 
 	public	:
@@ -67,10 +92,13 @@ class Server
 		void	setPort(unsigned short port);
 		void	setIP(const std::string &ip);
 		void	setServerName(const std::string &server_name);
+		void	setSocketFd(int socket_fd);
 
-		const std::string &getIP();
-		const std::string &getServerName();
-		unsigned short	   getPort();
+		const std::string &getIP() const;
+		const std::string &getServerName() const;
+		unsigned short	   getPort() const;
+		int				   getSocketFd() const;
+		Location			&getPerfectLocation(std::string &uri);
 
 		std::map<std::string, Location> &getLocations();
 		//for test//
@@ -88,6 +116,8 @@ class Location
 		std::string		error_number;
 		std::string		upload_path;
 		bool			auto_index;
+		std::string		cgi_extension;
+		std::string		auth_key;
 
 	public	:
 		Location();
@@ -101,6 +131,8 @@ class Location
 		void			setErrorNumber(const std::string &error_number);
 		void			setUploadPath(const std::string &upload_path);
 		void			setAutoIndex(bool auto_index);
+		void			setCgiExtension(const std::string &cgi_extension);
+		void			setAuthKey(const std::string &auth_key);
 
 		const std::string &getRoot();
 		std::list<std::string> &getIndex();
@@ -110,6 +142,8 @@ class Location
 		const std::string &getErorrNumber();
 		const std::string &getUploadPath();
 		bool	getAutoIndex();
+		const std::string &getCgiExtension();
+		const std::string &getAuthKey();
 
 		//for test//
 		void	show();

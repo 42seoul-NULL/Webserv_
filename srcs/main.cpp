@@ -1,26 +1,28 @@
 #include "../libft_cpp/libft.hpp"
 #include "../includes/parser.hpp"
-#include "../includes/Request.hpp"
+#include "../includes/nginx.hpp"
 
 int	main(int ac, char **av)
 {
-	(void)ac;
-	(void)av;
+	ac = 0;
 
-	Request	test_request;
+	if(!Config::getInstance()->makeConfig(av[1]))
+		return (1);
+	//Config::getInstance()->show();
 
-	while (test_request.tryMakeRequest())
-		;
+	Nginx nginx;
+	struct timeval		timeout;
 
-	// test_request.makeStartLine();
-	// while (test_request.makeRequestHeader() == -1)
-	// {
-	// 	read() -> raw_request ->
-	// };
-	// test_request.makeRequestBody();
-	std::cout << test_request.createRawRequest();
+	timeout.tv_sec = 5; // last request time out 5000ms
+	timeout.tv_usec = 0;
 
-	// std::cout << ft_strlen("hello\n!!") << std::endl;
-	std::cout << "\n\n<body>\n";
-	test_request.bodyPrint();
+	try
+	{
+		nginx.initServers(5);
+		nginx.run(timeout, 100);
+	}
+	catch(const char *e)
+	{
+		std::cerr << e << '\n';
+	}
 }

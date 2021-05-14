@@ -22,7 +22,18 @@ FILES = ft_memset \
 		ft_putstr_fd \
 		ft_putendl_fd \
 		ft_putnbr_fd \
-		get_next_line
+		ft_nbr_length \
+		get_next_line \
+		ft_fd_zero \
+		ft_fd_set \
+		ft_fd_isset \
+		ft_fd_clr \
+		ft_htonl \
+		ft_htons \
+		ft_ntohl \
+		ft_ntohs \
+		ft_get_time \
+		ft_atoi_hex
 
 SRCS_DIR = ./
 SRCS = $(addprefix $(SRCS_DIR), $(addsuffix .cpp, $(FILES)))

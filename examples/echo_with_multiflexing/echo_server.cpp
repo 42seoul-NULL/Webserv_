@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   echo_server.cpp                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/05/05 20:19:56 by honlee            #+#    #+#             */
-/*   Updated: 2021/05/06 11:45:17 by honlee           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include <iostream>
 #include <string>
 #include <stdlib.h>
@@ -19,6 +7,10 @@
 #include <sys/time.h>
 #include <sys/select.h>
 
+#include <unistd.h>
+
+#include <fcntl.h>
+
 #define BUF_SIZE 100
 
 void    error_handling(const std::string &str)
@@ -27,7 +19,6 @@ void    error_handling(const std::string &str)
 	printf("error %d : %s\n", errno,strerror(errno));
     exit(1);
 }
-
 
 // int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout)
 
@@ -51,6 +42,9 @@ int     main(int ac, char **av)
 	fd_set	reads;
 	fd_set	cpy_reads;
 
+	fd_set	writes;
+	fd_set	cpy_writes;
+
 	socklen_t	addr_size;
 	int		fd_max, str_len, fd_num;
 	char	buf[BUF_SIZE];
@@ -71,11 +65,13 @@ int     main(int ac, char **av)
 
 	FD_ZERO(&reads); // fd_set 테이블을 초기화한다.
 	FD_SET(server_socket, &reads); // 서버 소켓의 이벤트를 검사하기 위해 fd_set 테이블에 추가한다.
+
 	fd_max = server_socket; // 이 부분은 전혀모르겠는데 ..? 띠용 
 	
 	while (1)
 	{
 		cpy_reads = reads;
+		cpy_writes = writes;
 		timeout.tv_sec = 5;
 		timeout.tv_usec = 5000;
 		//result
@@ -83,7 +79,7 @@ int     main(int ac, char **av)
 		// 0   : 타임 아웃
 		// 1이상: 등록된 파일 디스크립터에 해당 이벤트가 발생하면 이벤트가 발생한 파일 디스크립터의 '수'를 반환
 
-		if ( (fd_num = select(fd_max + 1, &cpy_reads, 0, 0, &timeout)) == -1 )
+		if ( (fd_num = select(fd_max + 1, &cpy_reads, &cpy_writes, 0, &timeout)) == -1 )
 		{
 			error_handling("select error");
 			break ;
@@ -102,6 +98,7 @@ int     main(int ac, char **av)
 					addr_size = sizeof(client_addr);
 					client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &addr_size);
 					FD_SET(client_socket, &reads); // fd_set 테이블에 클라이언트 소켓 디스크립터를 추가한다.
+					FD_SET(client_socket, &writes);
 					if (fd_max < client_socket)
 						fd_max = client_socket;
 					printf("connected client : %d \n", client_socket);
@@ -115,11 +112,11 @@ int     main(int ac, char **av)
 						close(i);
 						printf("closed client: %d\n",i);
 					}
-					else
-					{
-						write (i, buf, str_len); // echo!
-					}
 				}
+			}
+			else if (FD_ISSET(i, &cpy_writes))
+			{
+				
 			}
 		}
 	}
