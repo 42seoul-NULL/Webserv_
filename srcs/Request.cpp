@@ -2,7 +2,8 @@
 
 Request::Request(void) : status(0), type(0)
 {
-	// this->raw_request = "GET /tutorials/other/top-20-mysql-best-practices/ HTTP/1.1\r\nHost: net.tutsplus.com\r\nUser-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\nAccept-Language: en-us,en;q=0.5\r\nAccept-Encoding: gzip,deflate\r\nAccept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7\r\n\r\n2\r\nab\r\n3\r\nxyz\r\n2\r\nef\r\n0\r\n";
+	this->raw_request.clear();
+	initRequest();
 }
 
 Request::Request(const Request& src) : raw_request(src.raw_request), method(src.method), uri(src.uri), http_version(src.http_version), accept_language(src.accept_language), authorization(src.authorization), content_length(src.content_length), content_type(src.content_type), date(src.date), host(src.host), referer(src.referer), transfer_encoding(src.transfer_encoding), user_agent(src.user_agent), status(src.status), type(src.type)
@@ -243,7 +244,6 @@ void	Request::parseMethod(void)
 {
 	std::size_t	found = this->raw_request.find("\r\n");
 	std::string start_line = this->raw_request.substr(0, found);
-
 	this->method = start_line.substr(0, start_line.find(' '));
 }
 

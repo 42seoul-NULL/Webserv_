@@ -31,7 +31,15 @@ const Server &Nginx::getServerFromClient(int server_socket_fd, const std::string
 
 Location &Nginx::getPerfectLocation(int server_socket_fd, const std::string &server_name, const std::string &uri)
 {
-	Location &ret = this->servers[server_socket_fd][server_name].getLocations()["/"];
+	std::map<std::string, Location> *locs;
+
+
+	if (this->servers[server_socket_fd].find(server_name) == this->servers[server_socket_fd].end()) // 못찾으면
+		locs = &(this->servers[server_socket_fd].begin()->second.getLocations());
+	else
+		locs = &(this->servers[server_socket_fd][server_name].getLocations());
+
+	Location &ret = (*locs)["/"];
 
 	std::string key = "";
 	for (std::string::const_iterator iter = uri.begin(); iter != uri.end(); iter++)
@@ -39,10 +47,10 @@ Location &Nginx::getPerfectLocation(int server_socket_fd, const std::string &ser
 		key += *iter;
 		if (*iter == '/')
 		{
-			if (this->servers[server_socket_fd][server_name].getLocations().find(key) == this->servers[server_socket_fd][server_name].getLocations().end())
+			if (locs->find(key) == locs->end())
 				return (ret);
 			else
-				ret = this->servers[server_socket_fd][server_name].getLocations()[key];
+				ret = (*locs)[key];
 		}
 	}
 	return (ret);
@@ -157,7 +165,17 @@ bool	Nginx::run(struct timeval	timeout, unsigned int buffer_size)
 						this->clients[i].getRequest().getRawRequest() += buf; // 무조건 더한다. (다음 리퀘스트가 미리 와있을 수 있다.)
 					}
 					if (this->clients[i].getStatus() == REQUEST_RECEIVING && clients[i].getRequest().tryMakeRequest() == true)
+					{
+						std::string _server_name = clients[i].getRequest().getHost();
+						size_t idx;
+						if ((idx = _server_name.find(':') ) != std::string::npos)
+							_server_name = _server_name.substr(0, idx);
+
+						this->clients[i].getResponse().makeResponse(this->clients[i].getRequest(), getPerfectLocation(this->clients[i].getServerSocketFd(), _server_name, this->clients[i].getRequest().getUri() ));
+						this->clients[i].getRequest().initRequest();
 						this->clients[i].setStatus(RESPONSE_READY);
+						std::cout << clients[i].getResponse().getRawResponse() << std::endl;
+					}
 
 					if (is_readable == false)
 					{
@@ -178,69 +196,11 @@ bool	Nginx::run(struct timeval	timeout, unsigned int buffer_size)
 					clear_connected_socket(i);
 					continue ;
 				}
-
 				if (this->clients[i].getStatus() == RESPONSE_READY)
 				{
-					// // TESTS
-					// Request &temp = this->clients[i].getRequest();
-					// std::cout << "----------------REQUEST----------------" << std::endl;
-					// std::cout << "Raw Request:-- " << temp.getRawRequest() << std::endl;
-					// std::cout << "Method:-- " << temp.getMethod() << std::endl;
-					// std::cout << "uri:-- " << temp.getUri() << std::endl;
-					// std::cout << "http version:-- " << temp.getHttpVersion() << std::endl;
-					// std::cout << "accept charsets:-- " << temp.getAcceptCharsets() << std::endl;
-					// std::cout << "accept language:-- " << temp.getAcceptLanguage() << std::endl;
-					// std::cout << "authorization:-- " << temp.getAuthorization() << std::endl;
-					// std::cout << "content length:-- " << temp.getContentLength() << std::endl;
-					// std::cout << "content type:-- " << temp.getContentType() << std::endl;
-					// std::cout << "date:-- " << temp.getDate() << std::endl;
-					// std::cout << "host:-- " << temp.getHost() << std::endl;
-					// std::cout << "referer:-- " << temp.getReferer() << std::endl;
-					// std::cout << "transfer encoding:-- " << temp.getTransferEncoding() << std::endl;
-					// std::cout << "user agent:-- " << temp.getUserAgent() << std::endl;
-					// std::cout << "--------------- RAW_BODY --------------" << std::endl;
-					// temp.bodyPrint();
-					// std::cout << "----------------END--------------------" << std::endl;
-
-					// //TEST END
-
-					
-					// std::string hard;
-
-					// int send_file_fd = open("tests/www/index.html", O_RDONLY);
-					// if (send_file_fd < 0)
-					// {
-					// 	std::cerr << "file open error" << std::endl;
-					// 	clients[i].setStatus(REQUEST_RECEIVING);
-					// 	continue ;	
-					// }
-					// struct stat sb;
-					// int ret;
-
-					// if (fstat(send_file_fd, &sb) == -1)
-					// { 
-					// 	std::cerr << "fstat error" << std::endl;
-					// 	clients[i].setStatus(REQUEST_RECEIVING);
-					// 	continue ;
-					// }
-
-					// hard += "HTTP/1.1 200 OK\r\n";
-					// hard += "Cache-Control: no-cache\r\n";
-					// hard += "Server: libnhttpd\r\n";
-					// hard += "Date: Wed Jul 4 15:32:03 2012\r\n";
-					// hard += "Connection: Keep-Alive\r\n";
-					// hard += "Content-Type: application/rdf+html\r\n";
-					// hard += "Content-Length: " + ft_itoa(sb.st_size) + "\r\n";
-					// hard += "\r\n";
-
-					// write(i, hard.c_str(), hard.size());
-
-					// while ( (ret = read(send_file_fd, buf, buffer_size) ) > 0 )
-					// {
-					// 	write(i, buf, ret);
-					// }
-
-					clients[i].setStatus(REQUEST_RECEIVING);
+					write(i, this->clients[i].getResponse().getRawResponse().c_str(), this->clients[i].getResponse().getRawResponse().size());
+					this->clients[i].getResponse().initResponse();
+					this->clients[i].setStatus(REQUEST_RECEIVING);
 				}
 			}
 			else if (FT_FD_ISSET(i, &cpy_errors))

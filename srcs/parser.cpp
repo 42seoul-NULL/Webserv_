@@ -4,6 +4,121 @@
 /////////////////// class Config start //////////////////
 Config* Config::instance;
 
+Config::Config()
+{
+	this->mime_type[".aac"] = "audio/aac";
+	this->mime_type[".abw"] = "application/x-abiword";
+	this->mime_type[".arc"] = "application/octet-stream";
+	this->mime_type[".avi"] = "video/x-msvideo";
+	this->mime_type[".azw"] = "application/vnd.amazon.ebook";
+	this->mime_type[".bin"] = "application/octet-stream";
+	this->mime_type[".bz"] = "application/x-bzip";
+	this->mime_type[".bz2"] = "application/x-bzip2";
+	this->mime_type[".csh"] = "application/x-csh";
+	this->mime_type[".css"] = "text/css";
+	this->mime_type[".csv"] = "text/csv";
+	this->mime_type[".doc"] = "application/msword";
+	this->mime_type[".epub"] = "application/epub+zip";
+	this->mime_type[".gif"] = "image/gif";
+	this->mime_type[".htm"] = "text/html";
+	this->mime_type[".html"] = "text/html";
+	this->mime_type[".ico"] = "image/x-icon";
+	this->mime_type[".ics"] = "text/calendar";
+	this->mime_type[".jar"] = "Temporary Redirect";
+	this->mime_type[".jpeg"] = "image/jpeg";
+	this->mime_type[".jpg"] = "image/jpeg";
+	this->mime_type[".js"] = "application/js";
+	this->mime_type[".json"] = "application/json";
+	this->mime_type[".mid"] = "audio/midi";
+	this->mime_type[".midi"] = "audio/midi";
+	this->mime_type[".mpeg"] = "video/mpeg";
+	this->mime_type[".mpkg"] = "application/vnd.apple.installer+xml";
+	this->mime_type[".odp"] = "application/vnd.oasis.opendocument.presentation";
+	this->mime_type[".ods"] = "application/vnd.oasis.opendocument.spreadsheet";
+	this->mime_type[".odt"] = "application/vnd.oasis.opendocument.text";
+	this->mime_type[".oga"] = "audio/ogg";
+	this->mime_type[".ogv"] = "video/ogg";
+	this->mime_type[".ogx"] = "application/ogg";
+	this->mime_type[".pdf"] = "application/pdf";
+	this->mime_type[".ppt"] = "application/vnd.ms-powerpoint";
+	this->mime_type[".rar"] = "application/x-rar-compressed";
+	this->mime_type[".rtf"] = "application/rtf";
+	this->mime_type[".sh"] = "application/x-sh";
+	this->mime_type[".svg"] = "image/svg+xml";
+	this->mime_type[".swf"] = "application/x-shockwave-flash";
+	this->mime_type[".tar"] = "application/x-tar";
+	this->mime_type[".tif"] = "image/tiff";
+	this->mime_type[".tiff"] = "image/tiff";
+	this->mime_type[".ttf"] = "application/x-font-ttf";
+	this->mime_type[".vsd"] = " application/vnd.visio";
+	this->mime_type[".wav"] = "audio/x-wav";
+	this->mime_type[".weba"] = "audio/webm";
+	this->mime_type[".webm"] = "video/webm";
+	this->mime_type[".webp"] = "image/webp";
+	this->mime_type[".woff"] = "application/x-font-woff";
+	this->mime_type[".xhtml"] = "application/xhtml+xml";
+	this->mime_type[".xls"] = "application/vnd.ms-excel";
+	this->mime_type[".xml"] = "application/xml";
+	this->mime_type[".xul"] = "application/vnd.mozilla.xul+xml";
+	this->mime_type[".zip"] = "application/zip";
+	this->mime_type[".3gp"] = "video/3gpp audio/3gpp";
+	this->mime_type[".3g2"] = "video/3gpp2 audio/3gpp2";
+	this->mime_type[".7z"] = "application/x-7z-compressed";
+
+	this->status_code["100"] = "Continue";
+	this->status_code["101"] = "Switching Protocols";
+	this->status_code["102"] = "Processing";
+	this->status_code["200"] = "OK";
+	this->status_code["201"] = "Created";
+	this->status_code["202"] = "Accepted";
+	this->status_code["203"] = "Non-authoritative Information";
+	this->status_code["204"] = "No Content";
+	this->status_code["205"] = "Reset Content";
+	this->status_code["206"] = "Partial Content";
+	this->status_code["207"] = "Multi-Status";
+	this->status_code["208"] = "Already Reported";
+	this->status_code["226"] = "IM Used";
+	this->status_code["300"] = "Multiple Choices";
+	this->status_code["301"] = "Moved Permanently";
+	this->status_code["302"] = "Found";
+	this->status_code["303"] = "See Other";
+	this->status_code["304"] = "Not Modified";
+	this->status_code["305"] = "Use Proxy";
+	this->status_code["307"] = "Temporary Redirect";
+	this->status_code["308"] = "Permanent Redirect";
+	this->status_code["400"] = "Bad Request";
+	this->status_code["401"] = "Unauthorized";
+	this->status_code["402"] = "Payment Required";
+	this->status_code["403"] = "Forbidden";
+	this->status_code["404"] = "Not found";
+	this->status_code["405"] = "Method Not Allowed";
+	this->status_code["406"] = "Not Acceptable";
+	this->status_code["407"] = "Proxy Authentication Required";
+	this->status_code["408"] = "Required Timeout";
+	this->status_code["409"] = "Conflict";
+	this->status_code["410"] = "Gone";
+	this->status_code["411"] = "Length Required";
+	this->status_code["412"] = "Precondition Failed";
+	this->status_code["413"] = "Request Entity Too Large";
+	this->status_code["414"] = "Request URI Too Long";
+	this->status_code["415"] = "Unsupported Media Type";
+	this->status_code["416"] = "Requested Range Not Satisfiable";
+	this->status_code["417"] = "Expectation Failed";
+	this->status_code["418"] = "IM_A_TEAPOT";
+	this->status_code["500"] = "Internal Server Error";
+	this->status_code["501"] = "Not Implemented";
+	this->status_code["502"] = "Bad Gateway";
+	this->status_code["503"] = "Service Unavailable";
+	this->status_code["504"] = "Gateway Timeout";
+	this->status_code["505"] = "HTTP Version Not Supported";
+	this->status_code["506"] = "Variant Also Negotiates";
+	this->status_code["507"] = "Insufficient Storage";
+	this->status_code["508"] = "Loop Detected";
+	this->status_code["510"] = "Not Extened";
+	this->status_code["511"] = "Network Authentication Required";
+	this->status_code["599"] = "Network Connect Timeout Error";
+}
+
 Config::Config(const Config &src)
 {
 	(void)src;
@@ -39,6 +154,16 @@ std::map<std::string, Server> &Config::getServers()
 	return (this->servers);
 }
 
+std::map<std::string, std::string> &Config::getMimeType()
+{
+	return (this->mime_type);
+}
+
+std::map<std::string, std::string> &Config::getStatusCode()
+{
+	return (this->status_code);
+}
+
 bool	Config::isReserved(const std::string &src)
 {
 	if (src == "server" || 
@@ -46,7 +171,6 @@ bool	Config::isReserved(const std::string &src)
 		src == "server_name" || 
 		src == "location" || 
 		src == "error_page" || 
-		src == "error_number" || 
 		src == "allow_methods" || 
 		src == "root" ||
 		src == "index" ||
@@ -55,6 +179,7 @@ bool	Config::isReserved(const std::string &src)
 		src == "client_body_buffer_size" ||
 		src == "auth_key" ||
 		src == "cgi_extension" ||
+		src == "return" ||
 		src == "}" ||
 		src == "{" )
 		return (true);
@@ -110,12 +235,9 @@ bool	Config::makeConfig(const char *path)
 			else if (*iter == "error_page")
 			{
 				iter++;
-				instance->servers[key].getLocations()[location_name].setErrorPage(*iter);
-			}
-			else if (*iter == "error_number")
-			{
+				int key2 = ft_atoi(*iter);
 				iter++;
-				instance->servers[key].getLocations()[location_name].setErrorNumber(*iter);
+				instance->servers[key].getLocations()[location_name].getErrorPages()[key2] = *iter;
 			}
 			else if (*iter == "allow_methods")
 			{
@@ -171,6 +293,13 @@ bool	Config::makeConfig(const char *path)
 			{
 				iter++;
 				instance->servers[key].getLocations()[location_name].setAuthKey(*iter);
+			}
+			else if (*iter == "return")
+			{
+				iter++;
+				instance->servers[key].getLocations()[location_name].setRedirectReturn(ft_atoi(*iter));
+				iter++;
+				instance->servers[key].getLocations()[location_name].setRedirectAddr(*iter);				
 			}
 		}
 	}
@@ -256,6 +385,11 @@ int			Client::getServerSocketFd()
 Request		&Client::getRequest()
 {
 	return (this->request);
+}
+
+Response	&Client::getResponse()
+{
+	return (this->response);
 }
 
 int		Client::getSocketFd()
@@ -380,7 +514,7 @@ void		Server::show()
 
 /////////////////////////////////////////////////////////
 ///////////////// class Location start //////////////////
-Location::Location() : client_body_buffer_size(-1)
+Location::Location() : client_body_buffer_size(-1), redirect_return(0)
 {
 	
 }
@@ -391,12 +525,13 @@ Location::Location(const Location &src)
 	this->index.assign(src.index.begin(), src.index.end());
 	this->allow_methods.assign(src.allow_methods.begin(), src.allow_methods.end());
 	this->client_body_buffer_size = src.client_body_buffer_size;
-	this->error_page = src.error_page;
-	this->error_number = src.error_number;
+	this->error_pages.insert(src.error_pages.begin(), src.error_pages.end());
 	this->upload_path = src.upload_path;
 	this->auto_index = src.auto_index;
 	this->cgi_extension = src.cgi_extension;
 	this->auth_key = src.auth_key;
+	this->redirect_addr = src.redirect_addr;
+	this->redirect_return = src.redirect_return;
 }
 
 Location &Location::operator=(const Location &src)
@@ -405,13 +540,13 @@ Location &Location::operator=(const Location &src)
 	this->index.assign(src.index.begin(), src.index.end());
 	this->allow_methods.assign(src.allow_methods.begin(), src.allow_methods.end());
 	this->client_body_buffer_size = src.client_body_buffer_size;
-	this->error_page = src.error_page;
-	this->error_number = src.error_number;
+	this->error_pages.insert(src.error_pages.begin(), src.error_pages.end());
 	this->upload_path = src.upload_path;
 	this->auto_index = src.auto_index;
 	this->cgi_extension = src.cgi_extension;
 	this->auth_key = src.auth_key;
-
+	this->redirect_addr = src.redirect_addr;
+	this->redirect_return = src.redirect_return;
 	return (*this);
 }
 
@@ -426,19 +561,6 @@ void		Location::setClientBodyBufferSize(int client_body_buffer_size)
 	this->client_body_buffer_size = client_body_buffer_size;
 	return ;
 }
-
-void		Location::setErrorPage(const std::string &error_page)
-{
-	this->error_page = error_page;
-	return ;
-}
-
-void		Location::setErrorNumber(const std::string &error_number)
-{
-	this->error_number = error_number;
-	return ;
-}
-
 void		Location::setUploadPath(const std::string &upload_path)
 {
 	this->upload_path = upload_path;
@@ -463,6 +585,18 @@ void		Location::setAuthKey(const std::string &auth_key)
 	return ;
 }
 
+void		Location::setRedirectReturn(int redirect_return)
+{
+	this->redirect_return = redirect_return;
+	return ;
+}
+
+void		Location::setRedirectAddr(const std::string &redirect_addr)
+{
+	this->redirect_addr = redirect_addr;
+	return ;
+}
+
 const std::string &Location::getRoot()
 {
 	return (this->root);
@@ -483,14 +617,9 @@ int Location::getClientBodyBufferSize()
 	return (this->client_body_buffer_size);
 }
 
-const std::string &Location::getErrorPage()
+std::map<int, std::string> &Location::getErrorPages()
 {
-	return (this->error_page);
-}
-
-const std::string &Location::getErorrNumber()
-{
-	return (this->error_number);
+	return (this->error_pages);
 }
 
 const std::string &Location::getUploadPath()
@@ -513,13 +642,21 @@ const std::string &Location::getAuthKey()
 	return (this->auth_key);
 }
 
+int		Location::getRedirectReturn()
+{
+	return (this->redirect_return);
+}
+
+const std::string &Location::getRedirectAddr()
+{
+	return (this->redirect_addr);
+}
+
 //for test
 void	Location::show()
 {
 	std::cout << "root	:	" << this->root << std::endl;
 	std::cout << "cbbs	:	" << this->client_body_buffer_size << std::endl;
-	std::cout << "error_page	:	" << this->error_page << std::endl;
-	std::cout << "error_number	:	" << this->error_number << std::endl;
 	std::cout << "upload_path	:	" << this->upload_path << std::endl;
 	std::cout << "auto_index	:	" << this->auto_index << std::endl;
 	std::cout << "cgi_extension	:	" << this->cgi_extension << std::endl;
@@ -532,6 +669,9 @@ void	Location::show()
 	for (std::list<std::string>::iterator iter = this->allow_methods.begin(); iter != this->allow_methods.end(); iter++)
 		std::cout << *iter << " ";
 	std::cout << std::endl;
+	std::cout << "error_pages	: ";
+	for (std::map<int, std::string>::iterator iter = this->error_pages.begin(); iter != this->error_pages.end(); iter++)
+		std::cout << iter->first << " | " << iter->second << std::endl;
 }
 
 ///////////////// class Location end ////////////////////

@@ -1,5 +1,5 @@
-#ifndef CONFIG_HPP
-# define CONFIG_HPP
+#ifndef PARSER_HPP
+# define PARSER_HPP
 
 # include <stdlib.h>
 # include <string>
@@ -12,6 +12,7 @@
 # include "../libft_cpp/libft.hpp"
 # include <queue>
 # include "Request.hpp"
+# include "Response.hpp"
 
 typedef enum			t_status
 {
@@ -21,11 +22,12 @@ typedef enum			t_status
 
 class Location;
 class Server;
+class Response;
 
 class Config
 {
 	private :
-		Config(){};
+		Config();
 		Config(const Config &src);
 		Config& operator=(const Config& src);
 		bool	returnFalseWithMsg(const char *str);
@@ -33,11 +35,15 @@ class Config
 
 		std::map<std::string, Server> servers;
 		static Config*	instance;
+		std::map<std::string, std::string> mime_type;
+		std::map<std::string, std::string> status_code;
 
 	public	:
 		virtual ~Config();
 		static Config* getInstance();
 		std::map<std::string, Server>& getServers();
+		std::map<std::string, std::string>& getMimeType();	
+		std::map<std::string, std::string>& getStatusCode();
 		bool	makeConfig(const char *path);
 		
 		//for test
@@ -51,6 +57,7 @@ class Client
 		int				server_socket_fd;
 		int				socket_fd;
 		Request			request;
+		Response		response;
 		long long		remain_body;
 		unsigned long	last_request_ms;
 
@@ -68,6 +75,7 @@ class Client
 		int			getSocketFd();
 		int			getServerSocketFd();
 		Request		&getRequest();
+		Response		&getResponse();
 		t_status	getStatus();
 		long long	getRemainBody();
 		unsigned long getLastRequestMs();
@@ -111,13 +119,15 @@ class Location
 		std::string		root;
 		std::list<std::string> index;
 		std::list<std::string> allow_methods;
+		std::map<int, std::string> error_pages;
 		int	client_body_buffer_size;
-		std::string		error_page;
-		std::string		error_number;
 		std::string		upload_path;
 		bool			auto_index;
 		std::string		cgi_extension;
 		std::string		auth_key;
+
+		int				redirect_return;
+		std::string		redirect_addr;
 
 	public	:
 		Location();
@@ -127,23 +137,24 @@ class Location
 
 		void			setRoot(const std::string &root);
 		void			setClientBodyBufferSize(int client_body_buffer_size);
-		void			setErrorPage(const std::string &error_page);
-		void			setErrorNumber(const std::string &error_number);
 		void			setUploadPath(const std::string &upload_path);
 		void			setAutoIndex(bool auto_index);
 		void			setCgiExtension(const std::string &cgi_extension);
 		void			setAuthKey(const std::string &auth_key);
+		void			setRedirectReturn(int redirect_return);
+		void			setRedirectAddr(const std::string &redirect_addr);
 
 		const std::string &getRoot();
 		std::list<std::string> &getIndex();
 		std::list<std::string> &getAllowMethods();
 		int getClientBodyBufferSize();
-		const std::string &getErrorPage();
-		const std::string &getErorrNumber();
 		const std::string &getUploadPath();
 		bool	getAutoIndex();
 		const std::string &getCgiExtension();
 		const std::string &getAuthKey();
+		int		getRedirectReturn();
+		const std::string &getRedirectAddr();
+		std::map<int, std::string> &getErrorPages();
 
 		//for test//
 		void	show();
