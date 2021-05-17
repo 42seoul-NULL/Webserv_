@@ -156,9 +156,9 @@ bool	Nginx::run(struct timeval	timeout, unsigned int buffer_size)
 						buf[len] = 0;
 						this->clients[i].getRequest().getRawRequest() += buf; // 무조건 더한다. (다음 리퀘스트가 미리 와있을 수 있다.)
 					}
-					if (clients[i].getRequest().tryMakeRequest() == true)
+					if (this->clients[i].getStatus() == REQUEST_RECEIVING && clients[i].getRequest().tryMakeRequest() == true)
 						this->clients[i].setStatus(RESPONSE_READY);
-					
+
 					if (is_readable == false)
 					{
 						clear_connected_socket(i);
@@ -181,64 +181,64 @@ bool	Nginx::run(struct timeval	timeout, unsigned int buffer_size)
 
 				if (this->clients[i].getStatus() == RESPONSE_READY)
 				{
-					// TESTS
-					Request &temp = this->clients[i].getRequest();
-					std::cout << "----------------REQUEST----------------" << std::endl;
-					std::cout << "Raw Request:-- " << temp.getRawRequest() << std::endl;
-					std::cout << "Method:-- " << temp.getMethod() << std::endl;
-					std::cout << "uri:-- " << temp.getUri() << std::endl;
-					std::cout << "http version:-- " << temp.getHttpVersion() << std::endl;
-					std::cout << "accept charsets:-- " << temp.getAcceptCharsets() << std::endl;
-					std::cout << "accept language:-- " << temp.getAcceptLanguage() << std::endl;
-					std::cout << "authorization:-- " << temp.getAuthorization() << std::endl;
-					std::cout << "content length:-- " << temp.getContentLength() << std::endl;
-					std::cout << "content type:-- " << temp.getContentType() << std::endl;
-					std::cout << "date:-- " << temp.getDate() << std::endl;
-					std::cout << "host:-- " << temp.getHost() << std::endl;
-					std::cout << "referer:-- " << temp.getReferer() << std::endl;
-					std::cout << "transfer encoding:-- " << temp.getTransferEncoding() << std::endl;
-					std::cout << "user agent:-- " << temp.getUserAgent() << std::endl;
-					std::cout << "--------------- RAW_BODY --------------" << std::endl;
-					temp.bodyPrint();
-					std::cout << "----------------END--------------------" << std::endl;
+					// // TESTS
+					// Request &temp = this->clients[i].getRequest();
+					// std::cout << "----------------REQUEST----------------" << std::endl;
+					// std::cout << "Raw Request:-- " << temp.getRawRequest() << std::endl;
+					// std::cout << "Method:-- " << temp.getMethod() << std::endl;
+					// std::cout << "uri:-- " << temp.getUri() << std::endl;
+					// std::cout << "http version:-- " << temp.getHttpVersion() << std::endl;
+					// std::cout << "accept charsets:-- " << temp.getAcceptCharsets() << std::endl;
+					// std::cout << "accept language:-- " << temp.getAcceptLanguage() << std::endl;
+					// std::cout << "authorization:-- " << temp.getAuthorization() << std::endl;
+					// std::cout << "content length:-- " << temp.getContentLength() << std::endl;
+					// std::cout << "content type:-- " << temp.getContentType() << std::endl;
+					// std::cout << "date:-- " << temp.getDate() << std::endl;
+					// std::cout << "host:-- " << temp.getHost() << std::endl;
+					// std::cout << "referer:-- " << temp.getReferer() << std::endl;
+					// std::cout << "transfer encoding:-- " << temp.getTransferEncoding() << std::endl;
+					// std::cout << "user agent:-- " << temp.getUserAgent() << std::endl;
+					// std::cout << "--------------- RAW_BODY --------------" << std::endl;
+					// temp.bodyPrint();
+					// std::cout << "----------------END--------------------" << std::endl;
 
-					//TEST END
+					// //TEST END
 
 					
-					std::string hard;
+					// std::string hard;
 
-					int send_file_fd = open("tests/www/index.html", O_RDONLY);
-					if (send_file_fd < 0)
-					{
-						std::cerr << "file open error" << std::endl;
-						clients[i].setStatus(REQUEST_RECEIVING);
-						continue ;	
-					}
-					struct stat sb;
-					int ret;
+					// int send_file_fd = open("tests/www/index.html", O_RDONLY);
+					// if (send_file_fd < 0)
+					// {
+					// 	std::cerr << "file open error" << std::endl;
+					// 	clients[i].setStatus(REQUEST_RECEIVING);
+					// 	continue ;	
+					// }
+					// struct stat sb;
+					// int ret;
 
-					if (fstat(send_file_fd, &sb) == -1) 
-					{ 
-						std::cerr << "fstat error" << std::endl;
-						clients[i].setStatus(REQUEST_RECEIVING);
-						continue ;
-					}
+					// if (fstat(send_file_fd, &sb) == -1)
+					// { 
+					// 	std::cerr << "fstat error" << std::endl;
+					// 	clients[i].setStatus(REQUEST_RECEIVING);
+					// 	continue ;
+					// }
 
-					hard += "HTTP/1.1 200 OK\r\n";
-					hard += "Cache-Control: no-cache\r\n";
-					hard += "Server: libnhttpd\r\n";
-					hard += "Date: Wed Jul 4 15:32:03 2012\r\n";
-					hard += "Connection: Keep-Alive\r\n";
-					hard += "Content-Type: application/rdf+html\r\n";
-					hard += "Content-Length: " + ft_itoa(sb.st_size) + "\r\n";
-					hard += "\r\n";
+					// hard += "HTTP/1.1 200 OK\r\n";
+					// hard += "Cache-Control: no-cache\r\n";
+					// hard += "Server: libnhttpd\r\n";
+					// hard += "Date: Wed Jul 4 15:32:03 2012\r\n";
+					// hard += "Connection: Keep-Alive\r\n";
+					// hard += "Content-Type: application/rdf+html\r\n";
+					// hard += "Content-Length: " + ft_itoa(sb.st_size) + "\r\n";
+					// hard += "\r\n";
 
-					write(i, hard.c_str(), hard.size());
+					// write(i, hard.c_str(), hard.size());
 
-					while ( (ret = read(send_file_fd, buf, buffer_size) ) > 0 )
-					{
-						write(i, buf, ret);
-					}
+					// while ( (ret = read(send_file_fd, buf, buffer_size) ) > 0 )
+					// {
+					// 	write(i, buf, ret);
+					// }
 
 					clients[i].setStatus(REQUEST_RECEIVING);
 				}
