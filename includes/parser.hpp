@@ -32,7 +32,7 @@ class Config
 		Config& operator=(const Config& src);
 		bool	returnFalseWithMsg(const char *str);
 		bool	isReserved(const std::string &src);
-
+		
 		std::map<std::string, Server> servers;
 		static Config*	instance;
 		std::map<std::string, std::string> mime_type;
@@ -41,6 +41,8 @@ class Config
 	public	:
 		virtual ~Config();
 		static Config* getInstance();
+		static const int decodeMimeBase64[256];
+		
 		std::map<std::string, Server>& getServers();
 		std::map<std::string, std::string>& getMimeType();	
 		std::map<std::string, std::string>& getStatusCode();

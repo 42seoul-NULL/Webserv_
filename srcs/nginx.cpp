@@ -170,13 +170,11 @@ bool	Nginx::run(struct timeval	timeout, unsigned int buffer_size)
 						size_t idx;
 						if ((idx = _server_name.find(':') ) != std::string::npos)
 							_server_name = _server_name.substr(0, idx);
-
 						this->clients[i].getResponse().makeResponse(this->clients[i].getRequest(), getPerfectLocation(this->clients[i].getServerSocketFd(), _server_name, this->clients[i].getRequest().getUri() ));
 						this->clients[i].getRequest().initRequest();
 						this->clients[i].setStatus(RESPONSE_READY);
 						std::cout << clients[i].getResponse().getRawResponse() << std::endl;
 					}
-
 					if (is_readable == false)
 					{
 						clear_connected_socket(i);
@@ -199,8 +197,13 @@ bool	Nginx::run(struct timeval	timeout, unsigned int buffer_size)
 				if (this->clients[i].getStatus() == RESPONSE_READY)
 				{
 					write(i, this->clients[i].getResponse().getRawResponse().c_str(), this->clients[i].getResponse().getRawResponse().size());
-					this->clients[i].getResponse().initResponse();
-					this->clients[i].setStatus(REQUEST_RECEIVING);
+					if (this->clients[i].getResponse().getLastResponse() == 401) // authentication 을 요구할경우 즉시 끊어준다.
+						clear_connected_socket(i);
+					else
+					{
+						this->clients[i].getResponse().initResponse();
+						this->clients[i].setStatus(REQUEST_RECEIVING);
+					}
 				}
 			}
 			else if (FT_FD_ISSET(i, &cpy_errors))

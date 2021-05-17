@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/12 16:40:53 by juyang            #+#    #+#             */
-/*   Updated: 2021/05/17 17:48:08 by honlee           ###   ########.fr       */
+/*   Updated: 2021/05/18 00:15:24 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,68 @@ Response&	Response::operator=(const Response& src)
 	return (*this);
 }
 
+int		 	Response::base64_decode(const char * text, char * dst, int numBytes)
+{
+    const char* cp;
+    int space_idx = 0, phase;
+    int d, prev_d = 0;
+    char c;
+    space_idx = 0;
+    phase = 0;
+    for (cp = text; *cp != '\0'; ++cp) {
+        d = Config::decodeMimeBase64[(int)*cp];
+        if (d != -1) {
+            switch (phase) {
+            case 0:
+                ++phase;
+                break;
+            case 1:
+                c = ((prev_d << 2) | ((d & 0x30) >> 4));
+                if (space_idx < numBytes)
+                    dst[space_idx++] = c;
+                ++phase;
+                break;
+            case 2:
+                c = (((prev_d & 0xf) << 4) | ((d & 0x3c) >> 2));
+                if (space_idx < numBytes)
+                    dst[space_idx++] = c;
+                ++phase;
+                break;
+            case 3:
+                c = (((prev_d & 0x03) << 6) | d);
+                if (space_idx < numBytes)
+                    dst[space_idx++] = c;
+                phase = 0;
+                break;
+            }
+            prev_d = d;
+        }
+    }
+    return space_idx;
+}
+
+bool	Response::isExist(std::string &path)
+{
+	struct stat buffer;
+	return ( stat(path.c_str(), &buffer) == 0 );
+}
+
+bool	Response::isDirectory(std::string &path)
+{
+	struct  stat buffer;
+	if ( stat(path.c_str(), &buffer) != 0 ) // 안열렸다
+		return (false);
+	return (S_ISDIR(buffer.st_mode));
+}
+
 void	Response::initResponse(void)
 {
 	this->raw_response.clear();
+}
+
+int		Response::getLastResponse()
+{
+	return (this->last_reponse);
 }
 
 int		Response::makeAllow(const Request& request, Location& location)
@@ -69,11 +128,26 @@ void	Response::makeDefaultBody(std::string &body, int error)
 	body += "</html>";	
 }
 
+int		Response::checkAuth(const Request &request, Location &location)
+{
+	if (location.getAuthKey() == "")
+		return (200);
+
+	char result[200];
+	ft_memset(result, 0, 200);
+	size_t idx = request.getAuthorization().find_first_of(' ');
+	std::string secret = request.getAuthorization().substr(idx + 1);
+	base64_decode(secret.c_str(), result, secret.size());
+	if (std::string(result) == location.getAuthKey())
+		return (200);
+	return (401);
+}
+
 void	Response::makeErrorReponse(const Request &request, Location &location, int error)
 {
 	initResponse();
 
-	// 나중에 처리 할 것
+	//디폴트 에러 페이지 존재할경우 이것으로 처리.
 
 	std::string body;
 	
@@ -104,7 +178,7 @@ void	Response::makeErrorReponse(const Request &request, Location &location, int 
 			close (fd);
 		}
 	}
-	
+
 	makeFirstLine(error);
 	this->raw_response += "Allow:";
 	for (std::list<std::string>::iterator iter = location.getAllowMethods().begin(); iter != location.getAllowMethods().end(); iter++)
@@ -116,6 +190,8 @@ void	Response::makeErrorReponse(const Request &request, Location &location, int 
 	makeDate(request);
 	this->raw_response += "Content-Type: " + Config::getInstance()->getMimeType()[".html"] + "\r\n";
 	this->raw_response += "Content-Length: " + ft_itoa(body.size()) + "\r\n";
+	if (error == 401)
+		makeWWWAuthenticate();
 	this->raw_response += "\r\n";
 	this->raw_response += body;
 	
@@ -181,7 +257,7 @@ int		Response::makeDate(const Request& request)
 	return (200);
 }
 
-int	Response::makeLastModified(const Request& request, Location &location)
+int		Response::makeLastModified(const Request& request, Location &location)
 {
 	int fd;
 	struct stat	sb;
@@ -193,13 +269,8 @@ int	Response::makeLastModified(const Request& request, Location &location)
 	absol_path.erase(--(absol_path.end()));
 	absol_path += request.getUri();
 
-	if ((fd = open(absol_path.c_str(), O_RDONLY)) < 0)
+	if (stat(absol_path.c_str(), &sb) < 0)
 		return (500);
-	if (fstat(fd, &sb) < 0)
-	{
-		close(fd);
-		return (500);
-	}
 	timeinfo = localtime(&sb.st_mtime);
 	strftime(buffer, 4096, "%a, %d %b %Y %H:%M:%S GMT", timeinfo); // 연도 잘 안나옴
 	this->raw_response += "Last-Modified: " + std::string(buffer) + "\r\n";
@@ -244,8 +315,53 @@ int		Response::makeFirstLine(int code)
 	return (code);
 }
 
+int		Response::makeAutoIndexPage(const Request& request, Location& location, const std::string &path)
+{
+	initResponse();
+
+	std::cout << "makeautoindexpage" << std::endl;
+
+	std::string body;
+	std::string pre_addr = "http://" + request.getHost() + "/";
+
+	body += "<!DOCTYPE html>";
+	body += "<html>";
+	body += "<head>";
+	body += "</head>";
+	body += "<body>";
+	body += "<h1> AutoIndex : "+ request.getUri() +"</h1>";
+
+	DIR *dir = NULL;
+	struct dirent *file = NULL;
+	if ( (dir = opendir(path.c_str())) == NULL )
+		return (500);
+	while ( (file = readdir(dir)) != NULL )
+	{
+		std::string file_name(file->d_name);
+		if (file_name != "." && file_name != "..")
+			body += "<a href=\"" + pre_addr + file_name + "\">" + file_name + "</a><br>";
+	}
+	closedir(dir);
+
+	body += "";
+	body += "";
+	body += "</body>";
+	body += "</html>";
+
+	makeFirstLine(200);
+	makeDate(request);
+	this->raw_response += "Content-Type: " + Config::getInstance()->getMimeType()[".html"] + "\r\n";
+	this->raw_response += "Content-Length: " + ft_itoa(body.size()) + "\r\n";
+	this->raw_response += "\r\n";
+	this->raw_response += body;
+	return (200);
+}
+
 int		Response::makeBody(const Request& request, Location &location)
 {
+	if (request.getMethod() != "GET")
+		return (200);
+
 	//여기서 만들기 직전에 makeContentType 호출
 	int fd;
 	struct stat	sb;
@@ -258,8 +374,26 @@ int		Response::makeBody(const Request& request, Location &location)
 	absol_path.erase(--(absol_path.end()));
 	absol_path += request.getUri();
 
+	if (isDirectory(absol_path))
+	{
+		bool is_exist = false;
+		std::string temp_path;
+		for (std::list<std::string>::iterator iter = location.getIndex().begin(); iter != location.getIndex().end(); iter++)
+		{
+			temp_path = (absol_path + (*iter));
+			if ((is_exist = isExist(temp_path)) == true)
+				break ;
+		}
+		if (is_exist == false && location.getAutoIndex())
+			return (makeAutoIndexPage(request, location, absol_path));
+		absol_path = temp_path;
+	}
+	if (!isExist(absol_path))
+		return (404);
+
 	idx = absol_path.find_first_of('/');
 	idx = absol_path.find_first_of('.',idx);
+
 	if (idx == std::string::npos) // 확장자가 없다.
 		makeContentType(request, "application/octet-stream");
 	else
@@ -274,6 +408,7 @@ int		Response::makeBody(const Request& request, Location &location)
 	}
 
 	makeContentLength((int)sb.st_size);
+	makeLastModified(request, location);
 	this->raw_response += "\r\n";
 
 	while ( (rb = read(fd, buf, buffer_size)) > 0 )
@@ -290,7 +425,7 @@ int		Response::makeBody(const Request& request, Location &location)
 	return (200);
 }
 
-void	Response::makeResponse(const Request& request, Location &location)
+int		Response::makeResponse(const Request& request, Location &location)
 {
 	int ret;
 
@@ -299,17 +434,16 @@ void	Response::makeResponse(const Request& request, Location &location)
 		//   first line :  GET /index/hello 1.1
 		if (location.getRedirectReturn() != 0)
 		{
-			// 따로 처리 (리다이렉션)
-			return ;
+			return (this->last_reponse = 301);
 		}
-		
+
 		if (
+				(ret = checkAuth(request, location)) != 200 ||
 				(ret = makeFirstLine(200)) != 200 ||
 				(ret = makeAllow(request, location)) != 200 ||
 				(ret = makeContentLanguage()) != 200 ||
 				(ret = makeContentLocation(request, location)) != 200 ||
 				(ret = makeDate(request)) != 200 ||
-				(ret = makeLastModified(request, location)) != 200 ||
 				(ret = makeRetryAfter()) != 200 ||
 				(ret = makeServer()) != 200 ||
 				(ret = makeWWWAuthenticate()) != 200 ||
@@ -317,11 +451,11 @@ void	Response::makeResponse(const Request& request, Location &location)
 			)
 		{
 			makeErrorReponse(request, location, ret);
-			return ;
+			return (this->last_reponse = ret);
 		}
-		return ;
+		return (this->last_reponse = 200);
 	}
-	return ;
+	return (this->last_reponse = 200);
 }
 
 const std::string&	Response::getRawResponse(void)

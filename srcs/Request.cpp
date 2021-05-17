@@ -65,7 +65,7 @@ const std::string&	Request::getAcceptLanguage(void) const
 
 const std::string&	Request::getAuthorization(void) const  // base64 로 복호화 한 후에    id:pass 로 함
 {
-	return (this->content_length);
+	return (this->authorization);
 }
 
 const std::string&	Request::getContentLength(void) const
