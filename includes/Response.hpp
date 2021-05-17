@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juyang <juyang@42student.co.kr>            +#+  +:+       +#+        */
+/*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/12 16:40:17 by juyang            #+#    #+#             */
-/*   Updated: 2021/05/12 16:40:17 by juyang           ###   ########.fr       */
+/*   Updated: 2021/05/17 10:46:11 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ class Response
 		std::string	location;
 		std::string	retry_after;
 		std::string	server;
-		std::string	transfer_encoding;
+		//std::string	transfer_encoding;
 		std::string	www_authenticate;
 
 		static std::map<std::string, std::string> mime_type;

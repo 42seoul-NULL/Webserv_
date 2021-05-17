@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juyang <juyang@42student.co.kr>            +#+  +:+       +#+        */
+/*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/12 16:40:53 by juyang            #+#    #+#             */
-/*   Updated: 2021/05/12 16:40:54 by juyang           ###   ########.fr       */
+/*   Updated: 2021/05/17 11:00:02 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,12 +128,12 @@
 // 	{"599", "Network Connect Timeout Error"},
 // };
 
-Response::Response(void) : allow(""), content_language(""), content_length(""), content_location(""), content_type(""), date(""), last_modified(""), location(""), retry_after(""), server(""), transfer_encoding(""), www_authenticate("")
+Response::Response(void)
 {
 
 }
 
-Response::Response(const Response& src) : allow(src.allow), content_language(src.content_language), content_length(src.content_length), content_location(src.content_location), content_type(src.content_type), date(src.date), last_modified(src.last_modified), location(src.location), retry_after(src.retry_after), server(src.server), transfer_encoding(src.transfer_encoding), www_authenticate(src.www_authenticate)
+Response::Response(const Response& src) : allow(src.allow), content_language(src.content_language), content_length(src.content_length), content_location(src.content_location), content_type(src.content_type), date(src.date), last_modified(src.last_modified), location(src.location), retry_after(src.retry_after), server(src.server), www_authenticate(src.www_authenticate)
 {
 
 }
@@ -155,7 +155,7 @@ Response&	Response::operator=(const Response& src)
 	this->location = src.location;
 	this->retry_after = src.retry_after;
 	this->server = src.server;
-	this->transfer_encoding = src.transfer_encoding;
+	//this->transfer_encoding = src.transfer_encoding;
 	this->www_authenticate = src.www_authenticate;
 
 	return (*this);
@@ -206,10 +206,10 @@ const std::string&	Response::getServer(void) const
 	return (this->server);
 }
 
-const std::string&	Response::getTransferEncoding(void) const
-{
-	return (this->transfer_encoding);
-}
+// const std::string&	Response::getTransferEncoding(void) const
+// {
+// 	return (this->transfer_encoding);
+// }
 
 const std::string&	Response::getWWWAuthenticate(void) const
 {
@@ -266,10 +266,10 @@ void	Response::setServer(const std::string& server)
 	this->server = server;
 }
 
-void	Response::setTransferEncoding(const std::string& transfer_encoding)
-{
-	this->transfer_encoding = transfer_encoding;
-}
+// void	Response::setTransferEncoding(const std::string& transfer_encoding)
+// {
+// 	this->transfer_encoding = transfer_encoding;
+// }
 
 void	Response::setWWWAuthenticate(const std::string& www_authenticate)
 {
@@ -278,18 +278,18 @@ void	Response::setWWWAuthenticate(const std::string& www_authenticate)
 
 void	Response::initResponse(void)
 {
-	this->allow = "";
-	this->content_language = "";
-	this->content_length = "";
-	this->content_location = "";
-	this->content_type = "";
-	this->date = "";
-	this->last_modified = "";
-	this->location = "";
-	this->retry_after = "";
-	this->server = "";
-	this->transfer_encoding = "";
-	this->www_authenticate = "";
+	this->allow.clear(); // allow > location 에서 처리할수 있는 method 를   예시) allow: GET POST\r\n
+	this->content_language.clear(); // 하드코딩 >  예시) content_language: ko-kr\r\n         // 이 문서가 어떤 자연어로 처리되었는가가 아니라, 어떤 독자들을 위해서 처리되었는가를 나타내는 헤더이다.
+	this->content_length.clear(); // 우리 서버는 무조건 성크 아니고 한방에 보낸다. 바디렝스찍어줌   예시) content_length: [body_size]\r\n     //
+	this->content_location.clear(); // 반환된 데이터에 대한 위치 //   처리하는 location 이 리다이렉션이 있을 경우 리다이렉션을 처리해서 리다이렉션 주소를 여기에 찍어줌. 예시) content_location: https://www.naver.com\r\n
+	this->content_type.clear(); // 요청한 데이터의 mime 타입을 리턴함.   요청된게 .jpg 면    예시 ) content_type: image/jpeg\r\n
+	this->date.clear(); // GMT 로 찍어줌.
+	this->last_modified.clear(); // 리턴하는 바디(요청된 리소스의 마지막 수정 시각)  문법은 GMT    예시 ) last_modified: 어쩌구 GMT
+	this->location.clear(); // 리다이렉션 발생되었을 때 필수, 201 이나 3xx 상태코드 반환될때만 의미가 있다.  location: [반환한 리소스의 절대경로]/r/n  (루트에서 부터 시작하는 절대경로)   http://[server_name]/tests/www/tmp/hyeonski.jpg
+	this->retry_after.clear(); // 검색봇같은 애들이 요청을 떄릴 때, 그럴 때   1. 몇월몇일 이후로 다시 요청해라,  2. 몇초있다가 요청해라   //  retry_after: 120\r\n
+	this->server.clear(); // request msg 에서 user_agent 있는 것처럼    server: ft_nginx_too_many_drivers_without_license\r\n
+	//this->transfer_encoding = ""; // 우리가 chunked 로 안보낼것이기 때문에 해당 헤더를 안보낸다.
+	this->www_authenticate.clear(); // 인증필요 와 같이  401 리턴   해당 헤더를 리턴한다.   www_authenticate: Basic realm="Give me ID:PASS encoded base64"
 }
 
 void	Response::createResponse(const Request& request, const Server& server)
@@ -310,6 +310,8 @@ void	Response::createResponse(const Request& request, const Server& server)
 
 void	Response::generateAllow(const Request& request, Server& server)
 {
+	//이렇게 find 처리하면 안될듯. /hello/man 이 왔을 경우 location 에 /hello/man 이 없으면 /hello 가 처리해야 되는 걸로 아는데 ..?
+
 	std::map<std::string, Location>::iterator location_iter = server.getLocations().find(request.getUri());
 	if (location_iter != server.getLocations().end())
 	{
@@ -323,11 +325,11 @@ void	Response::generateAllow(const Request& request, Server& server)
 				this->allow += ", ";
 			}
 		}
-	} else
+	}
+	else
 	{
 		std::cout << "Not found Server" << std::endl;
 	}
-	
 }
 
 void	Response::generateContentLanguage(const Request& request)
@@ -436,14 +438,14 @@ void	Response::generateServer(const Request& request)
 	this->server = "NoBusWebserv/1.0 HTTP/1.1";
 }
 
-void	Response::generateTransferEncoding(const Request& request)
-{
-	// chunked 에 대한 기준이 필요함. chunked 해서 Response 까지 보낼 것인지 선택하는게 관건
-	// default 로 gzip
+// void	Response::generateTransferEncoding(const Request& request)
+// {
+// 	// chunked 에 대한 기준이 필요함. chunked 해서 Response 까지 보낼 것인지 선택하는게 관건
+// 	// default 로 gzip
 
-	(void)request;
-	this->transfer_encoding += "gzip";
-}
+// 	(void)request;
+// 	this->transfer_encoding += "gzip";
+// }
 
 void	Response::generateWWWAuthenticate(const Request& request)
 {
@@ -472,7 +474,7 @@ void	Response::generateRawResponseHeader(void) const
 	raw_header += "Location: " + this->location + "\r\n";
 	raw_header += "Retry-After: " + this->retry_after + "\r\n";
 	raw_header += "Server: " + this->server + "\r\n";
-	raw_header += "Transfer-Encoding: " + this->transfer_encoding + "\r\n";
+//	raw_header += "Transfer-Encoding: " + this->transfer_encoding + "\r\n";
 	raw_header += "WWW-Authenticate: " + this->www_authenticate + "\r\n";
 	raw_header += "\r\n";
 

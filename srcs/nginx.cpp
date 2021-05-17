@@ -108,6 +108,8 @@ bool	Nginx::run(struct timeval	timeout, unsigned int buffer_size)
 
 	while (1)
 	{
+		usleep(5); // cpu 점유가 100% 까지 올라가는 것을 막기 위해서
+
 		cpy_reads = this->reads;
 		cpy_writes = this->writes;
 		cpy_errors = this->errors;
@@ -176,6 +178,7 @@ bool	Nginx::run(struct timeval	timeout, unsigned int buffer_size)
 					clear_connected_socket(i);
 					continue ;
 				}
+
 				if (this->clients[i].getStatus() == RESPONSE_READY)
 				{
 					// TESTS
