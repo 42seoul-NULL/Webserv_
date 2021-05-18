@@ -6,7 +6,7 @@
 /*   By: honlee <honlee@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/12 16:40:53 by juyang            #+#    #+#             */
-/*   Updated: 2021/05/18 00:15:24 by honlee           ###   ########.fr       */
+/*   Updated: 2021/05/18 10:36:25 by honlee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -429,6 +429,10 @@ int		Response::makeResponse(const Request& request, Location &location)
 {
 	int ret;
 
+	if (location.getRedirectReturn() != -1) // 리다이렉션 하는 location 이라면
+	{
+		//리다이렉션 작업해줘야함.
+	}
 	if (request.getMethod() == "GET" || request.getMethod() == "HEAD")
 	{
 		//   first line :  GET /index/hello 1.1

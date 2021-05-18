@@ -89,7 +89,6 @@ class Server
 		std::string		ip;
 		unsigned short	port;
 		std::string		server_name;
-		std::string		error_page;
 		int				socket_fd;
 		std::map<std::string, Location> locations;
 
@@ -108,7 +107,6 @@ class Server
 		const std::string &getServerName() const;
 		unsigned short	   getPort() const;
 		int				   getSocketFd() const;
-		Location			&getPerfectLocation(std::string &uri);
 
 		std::map<std::string, Location> &getLocations();
 		//for test//
@@ -122,7 +120,7 @@ class Location
 		std::list<std::string> index;
 		std::list<std::string> allow_methods;
 		std::map<int, std::string> error_pages;
-		int	client_body_buffer_size;
+		int				request_max_body_size;
 		std::string		upload_path;
 		bool			auto_index;
 		std::string		cgi_extension;
@@ -138,7 +136,7 @@ class Location
 		Location& operator=(const Location &src);
 
 		void			setRoot(const std::string &root);
-		void			setClientBodyBufferSize(int client_body_buffer_size);
+		void			setRequestMaxBodySize(int request_max_body_size);
 		void			setUploadPath(const std::string &upload_path);
 		void			setAutoIndex(bool auto_index);
 		void			setCgiExtension(const std::string &cgi_extension);
@@ -149,7 +147,7 @@ class Location
 		const std::string &getRoot();
 		std::list<std::string> &getIndex();
 		std::list<std::string> &getAllowMethods();
-		int getClientBodyBufferSize();
+		int getRequestMaxBodySize();
 		const std::string &getUploadPath();
 		bool	getAutoIndex();
 		const std::string &getCgiExtension();

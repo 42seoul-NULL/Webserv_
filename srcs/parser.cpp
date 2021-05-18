@@ -195,7 +195,7 @@ bool	Config::isReserved(const std::string &src)
 		src == "index" ||
 		src == "upload_path" ||
 		src == "auto_index" ||
-		src == "client_body_buffer_size" ||
+		src == "request_max_body_size" ||
 		src == "auth_key" ||
 		src == "cgi_extension" ||
 		src == "return" ||
@@ -300,10 +300,10 @@ bool	Config::makeConfig(const char *path)
 				else
 					instance->servers[key].getLocations()[location_name].setAutoIndex(false);
 			}
-			else if (*iter == "client_body_buffer_size")
+			else if (*iter == "request_max_body_size")
 			{
 				iter++;
-				instance->servers[key].getLocations()[location_name].setClientBodyBufferSize(ft_atoi(*iter));
+				instance->servers[key].getLocations()[location_name].setRequestMaxBodySize(ft_atoi(*iter));
 			}
 			else if (*iter == "cgi_extension")
 			{
@@ -442,7 +442,6 @@ Server::Server(const Server& src)
 	this->ip = src.ip;
 	this->port	=	src.port;
 	this->server_name	=	src.server_name;
-	this->error_page	=	src.error_page;
 	this->socket_fd		=	src.socket_fd;
 	this->locations.insert(src.locations.begin(), src.locations.end());
 }
@@ -452,7 +451,6 @@ Server &Server::operator=(const Server &src)
 	this->ip = src.ip;
 	this->port	=	src.port;
 	this->server_name	=	src.server_name;
-	this->error_page	=	src.error_page;
 	this->socket_fd		=	src.socket_fd;
 	this->locations.clear();
 	this->locations.insert(src.locations.begin(), src.locations.end());
@@ -520,7 +518,6 @@ void		Server::show()
 	std::cout << "ip	:	" << this->ip << std::endl;
 	std::cout << "port	:	" << this->port << std::endl;
 	std::cout << "server_name	:	" << this->server_name << std::endl;
-	std::cout << "error_page	:	" << this->error_page << std::endl;
 	std::cout << "============= location start =============" << std::endl;
 	for (std::map<std::string, Location>::iterator iter = locations.begin(); iter != locations.end(); iter++)
 	{
@@ -535,7 +532,7 @@ void		Server::show()
 
 /////////////////////////////////////////////////////////
 ///////////////// class Location start //////////////////
-Location::Location() : client_body_buffer_size(-1), redirect_return(0)
+Location::Location() : request_max_body_size(-1), redirect_return(-1)
 {
 	
 }
@@ -545,7 +542,7 @@ Location::Location(const Location &src)
 	this->root	=	src.root;
 	this->index.assign(src.index.begin(), src.index.end());
 	this->allow_methods.assign(src.allow_methods.begin(), src.allow_methods.end());
-	this->client_body_buffer_size = src.client_body_buffer_size;
+	this->request_max_body_size = src.request_max_body_size;
 	this->error_pages.insert(src.error_pages.begin(), src.error_pages.end());
 	this->upload_path = src.upload_path;
 	this->auto_index = src.auto_index;
@@ -560,7 +557,7 @@ Location &Location::operator=(const Location &src)
 	this->root	=	src.root;
 	this->index.assign(src.index.begin(), src.index.end());
 	this->allow_methods.assign(src.allow_methods.begin(), src.allow_methods.end());
-	this->client_body_buffer_size = src.client_body_buffer_size;
+	this->request_max_body_size = src.request_max_body_size;
 	this->error_pages.insert(src.error_pages.begin(), src.error_pages.end());
 	this->upload_path = src.upload_path;
 	this->auto_index = src.auto_index;
@@ -577,9 +574,9 @@ void		Location::setRoot(const std::string& root)
 	return ;
 }
 
-void		Location::setClientBodyBufferSize(int client_body_buffer_size)
+void		Location::setRequestMaxBodySize(int request_max_body_size)
 {
-	this->client_body_buffer_size = client_body_buffer_size;
+	this->request_max_body_size = request_max_body_size;
 	return ;
 }
 void		Location::setUploadPath(const std::string &upload_path)
@@ -633,9 +630,9 @@ std::list<std::string> &Location::getAllowMethods()
 	return (this->allow_methods);
 }
 
-int Location::getClientBodyBufferSize()
+int Location::getRequestMaxBodySize()
 {
-	return (this->client_body_buffer_size);
+	return (this->request_max_body_size);
 }
 
 std::map<int, std::string> &Location::getErrorPages()
@@ -677,7 +674,7 @@ const std::string &Location::getRedirectAddr()
 void	Location::show()
 {
 	std::cout << "root	:	" << this->root << std::endl;
-	std::cout << "cbbs	:	" << this->client_body_buffer_size << std::endl;
+	std::cout << "rqmbs	:	" << this->request_max_body_size << std::endl;
 	std::cout << "upload_path	:	" << this->upload_path << std::endl;
 	std::cout << "auto_index	:	" << this->auto_index << std::endl;
 	std::cout << "cgi_extension	:	" << this->cgi_extension << std::endl;
@@ -690,7 +687,7 @@ void	Location::show()
 	for (std::list<std::string>::iterator iter = this->allow_methods.begin(); iter != this->allow_methods.end(); iter++)
 		std::cout << *iter << " ";
 	std::cout << std::endl;
-	std::cout << "error_pages	: ";
+	std::cout << "error_pages	: " << std::endl;
 	for (std::map<int, std::string>::iterator iter = this->error_pages.begin(); iter != this->error_pages.end(); iter++)
 		std::cout << iter->first << " | " << iter->second << std::endl;
 }
