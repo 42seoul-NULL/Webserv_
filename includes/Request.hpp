@@ -27,7 +27,6 @@ class Request
 		std::string	referer;
 		std::string	transfer_encoding;
 		std::string	user_agent;
-
 		std::string raw_header;
 		std::string	raw_body;
 

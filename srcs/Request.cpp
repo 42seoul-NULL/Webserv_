@@ -1,8 +1,9 @@
 #include "../includes/Request.hpp"
 
-Request::Request(void) : raw_request(""), method(""), uri(""), http_version(""), accept_charsets(""), accept_language(""), authorization(""), content_length(""), content_type(""), date(""), host(""), referer(""), transfer_encoding(""), user_agent(""), status(0), type(0)
+Request::Request(void) : status(0), type(0)
 {
-	// this->raw_request = "GET /tutorials/other/top-20-mysql-best-practices/ HTTP/1.1\r\nHost: net.tutsplus.com\r\nUser-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\nAccept-Language: en-us,en;q=0.5\r\nAccept-Encoding: gzip,deflate\r\nAccept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7\r\n\r\n2\r\nab\r\n3\r\nxyz\r\n2\r\nef\r\n0\r\n";
+	this->raw_request.clear();
+	initRequest();
 }
 
 Request::Request(const Request& src) : raw_request(src.raw_request), method(src.method), uri(src.uri), http_version(src.http_version), accept_language(src.accept_language), authorization(src.authorization), content_length(src.content_length), content_type(src.content_type), date(src.date), host(src.host), referer(src.referer), transfer_encoding(src.transfer_encoding), user_agent(src.user_agent), status(src.status), type(src.type)
@@ -62,9 +63,9 @@ const std::string&	Request::getAcceptLanguage(void) const
 	return (this->accept_language);
 }
 
-const std::string&	Request::getAuthorization(void) const
+const std::string&	Request::getAuthorization(void) const  // base64 로 복호화 한 후에    id:pass 로 함
 {
-	return (this->content_length);
+	return (this->authorization);
 }
 
 const std::string&	Request::getContentLength(void) const
@@ -159,24 +160,24 @@ void	Request::setUserAgent(const std::string& user_agent)
 
 void	Request::initRequest(void)
 {
-	this->method = "";
-	this->uri = "";
-	this->http_version = "";
+	this->method.clear();
+	this->uri.clear();
+	this->http_version.clear();
+	
+	this->accept_charsets.clear();
+	this->accept_language.clear();
+	this->authorization.clear();
+	this->content_length.clear();
+	this->content_type.clear();
+	this->date.clear();
+	this->host.clear();
+	this->referer.clear();
+	this->transfer_encoding.clear();
+	this->user_agent.clear();
 
-	this->accept_charsets = "";
-	this->accept_language = "";
-	this->authorization = "";
-	this->content_length = "";
-	this->content_type = "";
-	this->date = "";
-	this->host = "";
-	this->referer = "";
-	this->transfer_encoding = "";
-	this->user_agent = "";
-
-	this->raw_header = "";
-	this->raw_body = "";
-	this->temp_body = "";
+	this->raw_header.clear();
+	this->raw_body.clear();
+	this->temp_body.clear();
 
 	status = 0;
 	type = 0;
@@ -243,7 +244,6 @@ void	Request::parseMethod(void)
 {
 	std::size_t	found = this->raw_request.find("\r\n");
 	std::string start_line = this->raw_request.substr(0, found);
-
 	this->method = start_line.substr(0, start_line.find(' '));
 }
 
@@ -253,7 +253,7 @@ void	Request::parseUri(void)
 	std::string start_line = this->raw_request.substr(0, found);
 	std::size_t start_pos = start_line.find(' ');
 
-	this->uri = start_line.substr(start_pos + 1, start_line.find_last_of(' ') - start_pos);
+	this->uri = start_line.substr(start_pos + 1, start_line.find_last_of(' ') - start_pos - 1);
 }
 
 void	Request::parseHttpVersion(void)
